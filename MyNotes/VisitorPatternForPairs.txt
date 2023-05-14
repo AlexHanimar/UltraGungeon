@@ -1,0 +1,100 @@
+#include <iostream>
+
+using namespace std;
+
+struct Inter;
+
+struct InterA;
+struct InterB;
+struct InterC;
+
+struct A;
+struct B;
+struct C;
+
+struct Inter {
+    virtual void apply(A*) = 0;
+    virtual void apply(B*) = 0;
+    virtual void apply(C*) = 0;
+};
+
+struct InterA : public Inter {
+    A* first;
+    void apply(A*) override;
+    void apply(B*) override;
+    void apply(C*) override;
+};
+
+
+struct InterB : public Inter {
+    B* first;
+    void apply(A*) override;
+    void apply(B*) override;
+    void apply(C*) override;
+};
+
+
+struct InterC : public Inter {
+    C* first;
+    void apply(A*) override;
+    void apply(B*) override;
+    void apply(C*) override;
+};
+
+struct A {
+    virtual Inter* generateInter();
+    virtual void accept(Inter* inter) {inter->apply(this);}
+};
+
+struct B : public A {
+    Inter* generateInter() override;
+    void accept(Inter* inter) override {inter->apply(this);}
+};
+
+struct C : public A {
+    Inter* generateInter() override;
+    void accept(Inter* inter) override {inter->apply(this);}
+};
+
+Inter* A::generateInter() {
+    auto inter = new InterA;
+    inter->first = this;
+    return inter;
+}
+
+Inter* B::generateInter() {
+    auto inter = new InterB;
+    inter->first = this;
+    return inter;
+}
+
+Inter* C::generateInter() {
+    auto inter = new InterC;
+    inter->first = this;
+    return inter;
+}
+
+void InterA::apply(A *) {cout << "AA\n";}
+void InterA::apply(B *) {cout << "AB\n";}
+void InterA::apply(C *) {cout << "AC\n";}
+void InterB::apply(A *) {cout << "BA\n";}
+void InterB::apply(B *) {cout << "BB\n";}
+void InterB::apply(C *) {cout << "BC\n";}
+void InterC::apply(A *) {cout << "CA\n";}
+void InterC::apply(B *) {cout << "CB\n";}
+void InterC::apply(C *) {cout << "CC\n";}
+
+void call(A* a1, A* a2)
+{
+    auto inter = a1->generateInter();
+    a2->accept(inter);
+}
+
+int main()
+{
+    A* a = new A;
+    A* b = new B;
+    A* c = new C;
+    call(b, c);
+    return 0;
+}
