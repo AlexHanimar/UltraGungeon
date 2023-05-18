@@ -55,6 +55,10 @@ void MainWindow::paintEvent(QPaintEvent *)
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    // to exit application
+    if(event->key() == Qt::Key_Escape)
+        this->close();
+
     if(event->isAutoRepeat())
         return;
     switch(event->key()){
