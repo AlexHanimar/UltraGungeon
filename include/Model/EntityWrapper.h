@@ -51,6 +51,7 @@ struct MovableEntity_Wrapper : public AbstractWrapper {
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
 };
+
 struct Time_Wrapper : public AbstractWrapper {
     qreal* item;
     AbstractInteraction* generateInteraction() override;
@@ -66,14 +67,12 @@ struct Wall_Interaction : public AbstractInteraction {
     void apply(Door_Wrapper* second) override;
     void apply(MovableEntity_Wrapper* second) override;
 };
-
 struct Door_Interaction : public AbstractInteraction {
     Door_Wrapper* first;
     void apply(Wall_Wrapper* second) override;
     void apply(Door_Wrapper* second) override;
     void apply(MovableEntity_Wrapper* second) override;
 };
-
 struct MovableEntity_Interaction : public AbstractInteraction {
     MovableEntity_Wrapper* first;
     void apply(Wall_Wrapper* second) override;
@@ -87,6 +86,7 @@ struct Time_Interaction : public AbstractInteraction {
     void apply(Door_Wrapper* second) override;
     void apply(MovableEntity_Wrapper* second) override;
 };
+
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -101,5 +101,6 @@ void interact(AbstractWrapper* a, AbstractWrapper* b);
 AbstractWrapper* wrap(Wall* item);
 AbstractWrapper* wrap(Door* item);
 AbstractWrapper* wrap(MovableEntity* item);
+
 AbstractWrapper* wrap(qreal* timeItem);
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

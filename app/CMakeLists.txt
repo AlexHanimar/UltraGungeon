@@ -8,7 +8,7 @@ target_link_libraries(UltraGungeon PRIVATE
         Interface
         Helpers
         )
-set(qt_dll_path "D:/Qt/6.5.0/mingw_64/bin")
+set(qt_dll_path "C:/Qt/6.5.0/mingw_64/bin")
 set(qt_dll_list
         "${qt_dll_path}/Qt6Core.dll"
         "${qt_dll_path}/Qt6Gui.dll"

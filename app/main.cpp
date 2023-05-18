@@ -10,7 +10,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    QApplication::addLibraryPath("D:/Qt/6.5.0/mingw_64/plugins");
+    QApplication::addLibraryPath("C:/Qt/6.5.0/mingw_64/plugins");
     QApplication app(argc, argv);
     auto* window = new MainWindow(10, {10000, 10000});
     window->show();

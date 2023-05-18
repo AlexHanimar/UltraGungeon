@@ -16,7 +16,7 @@ target_include_directories(BasicObjects PUBLIC ../../include)
 
 
 
-set(CMAKE_PREFIX_PATH D:/Qt/6.5.0/mingw_64/lib/cmake)
+set(CMAKE_PREFIX_PATH "C:/Qt/6.5.0/mingw_64/lib/cmake;D:/Qt/6.5.0/mingw_64/lib/cmake")
 find_package(Qt6 COMPONENTS
         Core
         Gui

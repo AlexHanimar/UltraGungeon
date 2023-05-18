@@ -30,3 +30,7 @@ void Model::addEntity(AbstractWrapper *entity)
     entities.push_back(entity);
 }
 
+void Model::setInputMask(int _inputMask)
+{
+    inputMask = _inputMask;
+}
