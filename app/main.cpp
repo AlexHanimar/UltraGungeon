@@ -5,6 +5,7 @@
 #include <Model/EntityWrapper.h>
 #include <Model/Model.h>
 #include <Interface/MainWindow.h>
+#include <Entities/Projectile.h>
 
 using namespace std;
 

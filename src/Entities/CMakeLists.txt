@@ -2,12 +2,17 @@ set(HEADER_LIST
         ../../include/Entities/Wall.h
         ../../include/Entities/Door.h
         ../../include/Entities/MovableEntity.h
+        ../../include/Entities/PlayerEntity.h
+        ../../include/Entities/Projectile.h
+        ../../include/Entities/Teams.h
         )
 
 set(SOURCE_LIST
         Wall.cpp
         Door.cpp
         MovableEntity.cpp
+        PlayerEntity.cpp
+        Projectile.cpp
         )
 
 add_library(Entities ${SOURCE_LIST} ${HEADER_LIST})

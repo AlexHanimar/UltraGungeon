@@ -1,0 +1,160 @@
+#include <Entities/PlayerEntity.h>
+#include <QDebug>
+
+int PlayerEntity::getState() const
+{
+    return state;
+}
+
+void PlayerEntity::setHealth(int _health)
+{
+    health = _health;
+}
+
+qreal PlayerEntity::getHealth() const
+{
+    return health;
+}
+
+void PlayerEntity::applyDamage(qreal damage)
+{
+    health -= damage;
+}
+
+void PlayerEntity::setWeapon(int _weapon)
+{
+    weapon = _weapon;
+}
+
+int PlayerEntity::getWeapon() const
+{
+    return weapon;
+}
+
+int PlayerEntity::getWeaponState() const
+{
+    return weaponState[weapon];
+}
+
+void PlayerEntity::setWeaponState(int _state)
+{
+    switch(_state) {
+        case PlayerEntity::WEAPON_STATE::READY:
+            weaponState[weapon] = PlayerEntity::WEAPON_STATE::READY;
+            break;
+        case PlayerEntity::WEAPON_STATE::RELOADING:
+            if(weaponState[weapon] != PlayerEntity::WEAPON_STATE::RELOADING) {
+                reloadTimer[weapon] = maxReloadTimer[weapon];
+                weaponState[weapon] = PlayerEntity::WEAPON_STATE::RELOADING;
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+int PlayerEntity::getSpawnAction() const
+{
+    return spawnAction;
+}
+
+void PlayerEntity::setSpawnAction(int _spawnAction)
+{
+    switch(_spawnAction) {
+        case PlayerEntity::SPAWN_ACTION::PISTOL_1:
+            spawnAction = PlayerEntity::SPAWN_ACTION::PISTOL_1;
+            break;
+        case PlayerEntity::SPAWN_ACTION::PISTOL_2:
+            spawnAction = PlayerEntity::SPAWN_ACTION::PISTOL_2;
+            break;
+        case PlayerEntity::SPAWN_ACTION::SHOTGUN_1:
+            spawnAction = PlayerEntity::SPAWN_ACTION::SHOTGUN_1;
+            break;
+        case PlayerEntity::SPAWN_ACTION::SHOTGUN_2:
+            spawnAction = PlayerEntity::SPAWN_ACTION::SHOTGUN_2;
+            break;
+        case PlayerEntity::SPAWN_ACTION::RAILGUN_1:
+            spawnAction = PlayerEntity::SPAWN_ACTION::RAILGUN_1;
+            break;
+        case PlayerEntity::SPAWN_ACTION::RAILGUN_2:
+            spawnAction = PlayerEntity::SPAWN_ACTION::RAILGUN_2;
+            break;
+        case PlayerEntity::SPAWN_ACTION::NONE:
+            spawnAction = PlayerEntity::SPAWN_ACTION::NONE;
+            break;
+        default:
+            break;
+    }
+}
+
+void PlayerEntity::setState(int _state)
+{
+    switch(_state) {
+        case PlayerEntity::STATE::DEFAULT:
+            setMaxSpeed(defaultSpeed);
+            state = PlayerEntity::STATE::DEFAULT;
+            break;
+        case PlayerEntity::STATE::DASHING:
+            if(state != PlayerEntity::STATE::DASHING) {
+                dashTimer = maxDashTimer;
+                setMaxSpeed(dashSpeed);
+                state = PlayerEntity::STATE::DASHING;
+            }
+            break;
+        case PlayerEntity::STATE::DASH_RECHARGE:
+            if(state != PlayerEntity::STATE::DASH_RECHARGE) {
+                dashRechargeTimer = maxDashRechargeTimer;
+                setMaxSpeed(defaultSpeed);
+                state = PlayerEntity::STATE::DASH_RECHARGE;
+            }
+        default:
+            break;
+    }
+}
+
+void PlayerEntity::update(qreal deltaT)
+{
+    moveBy(direction * speed * deltaT);
+    if(state == PlayerEntity::STATE::DASHING) {
+        dashTimer -= deltaT;
+        if(dashTimer < 0)
+            setState(PlayerEntity::STATE::DASH_RECHARGE);
+    }
+    else if(state == PlayerEntity::STATE::DASH_RECHARGE) {
+        dashRechargeTimer -= deltaT;
+        if(dashRechargeTimer < 0)
+            setState(PlayerEntity::STATE::DEFAULT);
+    }
+    for(int i = 0;i < reloadTimer.size();i++) {
+        if(weaponState[i] == PlayerEntity::WEAPON_STATE::READY)
+            continue;
+        reloadTimer[i] -= deltaT;
+        if(reloadTimer[i] < 0)
+            weaponState[i] = PlayerEntity::WEAPON_STATE::READY;
+    }
+}
+
+void PlayerEntity::setSpawnDirection(QPointF _spawnDirection)
+{
+    spawnDirection = _spawnDirection;
+}
+
+QPointF PlayerEntity::getSpawnDirection() const
+{
+    return spawnDirection;
+}
+
+void PlayerEntity::init()
+{
+    defaultSpeed = 100.0;
+    dashSpeed = 500.0;
+    maxDashTimer = 0.1;
+    maxDashRechargeTimer = 1.0;
+    health = 100;
+    maxReloadTimer = {0.5, 1.0, 10.0};
+    reloadTimer = {0.0, 0.0, 0.0};
+    weaponState = {PlayerEntity::WEAPON_STATE::READY, PlayerEntity::WEAPON_STATE::READY, PlayerEntity::WEAPON_STATE::READY};
+    weapon = PlayerEntity::WEAPON::PISTOL;
+    setState(PlayerEntity::STATE::DEFAULT);
+    setSpawnAction(PlayerEntity::SPAWN_ACTION::NONE);
+}

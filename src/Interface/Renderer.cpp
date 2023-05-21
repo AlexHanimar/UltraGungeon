@@ -6,6 +6,7 @@ struct {
     QImage* Door_Sprite = new QImage("../../sprites/defaultSprite.png");
     QImage* MovableEntity_Sprite = new QImage("../../sprites/defaultSprite.png");
     QImage* PlayerEntity_Sprite = new QImage("../../sprites/defaultSprite.png");
+    QImage* Projectile_Sprite = new QImage("../../sprites/defaultSprite.png");
 } Sprites;
 
 AbstractInteraction *Renderer_Wrapper::generateInteraction()
@@ -40,6 +41,29 @@ void Renderer_Interaction::apply(MovableEntity_Wrapper *second)
     auto* img = Sprites.Wall_Sprite;
     QPoint dPos = QPoint(-img->width() * 0.5, -img->height() * 0.5);
     auto* item = first->scene->addPixmap(QPixmap::fromImage(*img));
+    item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
+    item->setScale(first->scale);
+}
+
+void Renderer_Interaction::apply(PlayerEntity_Wrapper *second)
+{
+    first->view->centerOn(second->item->getAbsolutePosition() * first->scale);
+    auto* img = Sprites.PlayerEntity_Sprite;
+    QPoint dPos = QPoint(-img->width() * 0.5, -img->height() * 0.5);
+    auto* item = first->scene->addPixmap(QPixmap::fromImage(*img));
+    item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
+    item->setScale(first->scale);
+}
+
+void Renderer_Interaction::apply(Projectile_Wrapper *second)
+{
+    if(second->item->getState() == Projectile::STATE::DESTROYED)
+        return;
+    auto* img = Sprites.Projectile_Sprite;
+    QSizeF size = second->item->getCollider()->getSize();
+    QImage img2 = img->scaled(size.width(), size.height());
+    QPoint dPos = QPoint(-img2.width() * 0.5, -img2.height() * 0.5);
+    auto* item = first->scene->addPixmap(QPixmap::fromImage(img2));
     item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
     item->setScale(first->scale);
 }

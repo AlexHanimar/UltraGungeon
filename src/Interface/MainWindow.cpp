@@ -2,6 +2,9 @@
 #include <QKeyEvent>
 
 void GraphicsView::wheelEvent(QWheelEvent *event) {event->ignore();}
+void GraphicsView::mousePressEvent(QMouseEvent *event) {event->ignore();}
+void GraphicsView::mouseReleaseEvent(QMouseEvent *event) {event->ignore();}
+void GraphicsView::mouseMoveEvent(QMouseEvent *event) {event->ignore();}
 
 MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
         : millisecondsPerFrame(_millisecondsPerFrame)
@@ -20,6 +23,7 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
     view->setFixedSize(this->size());
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    screenCenter = {this->size().width() / 2, this->size().height() / 2};
     this->setMouseTracking(true);
 
     auto* entity = new MovableEntity(100, {10, 10}, {500, 500});
@@ -37,20 +41,32 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
         model->addEntity(wrap(wall));
         pos += {10, 0};
     }
+
+    auto* player = new PlayerEntity(0, {10, 10}, {1000, 1000});
+    player->init();
+    model->setPlayerEntity(player);
+
+    auto* proj = new Projectile(100, {10, 10}, {800, 300});
+    proj->setTeam(TEAM::NEUTRAL);
+    proj->setState(Projectile::STATE::DEFAULT);
+    proj->setDamage(10);
+    proj->setVelocity({-100, 0});
+    model->addEntity(wrap(proj));
 }
 
 void MainWindow::paintEvent(QPaintEvent *)
 {
     scene->clear();
-    view->centerOn(screenCenter * scale);
     auto* renderer = new Renderer_Wrapper;
     renderer->scale = scale;
     renderer->scene = scene;
     renderer->view = view;
     for(auto* entity : model->getEntities())
         interact(renderer, entity);
+    interact(renderer, model->getPlayerEntity());
     delete renderer;
     this->setCentralWidget(view);
+    centralWidget()->setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -74,6 +90,18 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         case Qt::Key_D:
             inputMask |= INPUT::KEY_D;
             break;
+        case Qt::Key_Shift:
+            inputMask |= INPUT::KEY_DASH;
+            break;
+        case Qt::Key_1:
+            inputMask |= INPUT::KEY_1;
+            break;
+        case Qt::Key_2:
+            inputMask |= INPUT::KEY_2;
+            break;
+        case Qt::Key_3:
+            inputMask |= INPUT::KEY_3;
+            break;
     }
 }
 
@@ -94,6 +122,18 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
         case Qt::Key_D:
             inputMask &= ~INPUT::KEY_D;
             break;
+        case Qt::Key_Shift:
+            inputMask &= ~INPUT::KEY_DASH;
+            break;
+        case Qt::Key_1:
+            inputMask &= ~INPUT::KEY_1;
+            break;
+        case Qt::Key_2:
+            inputMask &= ~INPUT::KEY_2;
+            break;
+        case Qt::Key_3:
+            inputMask &= ~INPUT::KEY_3;
+            break;
     }
 }
 
@@ -101,15 +141,8 @@ void MainWindow::onFrameStart()
 {
     timer->stop();
     model->setInputMask(inputMask);
+    model->setMouseDirection(mouseDirection);
     model->update(0.001 * millisecondsPerFrame);
-    if(inputMask & INPUT::KEY_W)
-        screenCenter += {0, -10};
-    if(inputMask & INPUT::KEY_A)
-        screenCenter += {-10, 0};
-    if(inputMask & INPUT::KEY_S)
-        screenCenter += {0, 10};
-    if(inputMask & INPUT::KEY_D)
-        screenCenter += {10, 0};
     repaint();
     timer->start(millisecondsPerFrame);
 }
@@ -123,4 +156,25 @@ void MainWindow::wheelEvent(QWheelEvent *event)
         scale = std::min(scale * factor, 8.0);
     else
         scale = std::max(scale * factor, 0.125);
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    mouseDirection = (event->pos() - screenCenter);
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton)
+        inputMask |= INPUT::MOUSE_1;
+    if(event->button() == Qt::RightButton)
+        inputMask |= INPUT::MOUSE_2;
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton)
+        inputMask &= ~INPUT::MOUSE_1;
+    if(event->button() == Qt::RightButton)
+        inputMask &= ~INPUT::MOUSE_2;
 }

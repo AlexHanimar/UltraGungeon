@@ -15,3 +15,10 @@ qreal module(QPointF vec)
     mod = sqrt(mod);
     return mod;
 }
+
+QPointF rotate(QPointF vec, qreal angle)
+{
+    qreal nx = vec.x() * cos(angle) - vec.y() * sin(angle);
+    qreal ny = vec.x() * sin(angle) + vec.y() * cos(angle);
+    return QPointF(nx, ny);
+}

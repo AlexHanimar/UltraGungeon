@@ -17,5 +17,5 @@ public:
     [[nodiscard("GameObject::getParent() unused")]] virtual GameObject* getParent() const;
     [[nodiscard("GameObject::getChildren() unused")]] virtual std::vector<GameObject*> getChildren() const;
 
-    virtual ~GameObject();
+    virtual ~GameObject() noexcept;
 };

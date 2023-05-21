@@ -1,5 +1,6 @@
 #include <Entities/MovableEntity.h>
 #include <Helpers/Helpers.h>
+#include <QDebug>
 
 MovableEntity::MovableEntity(qreal _maxSpeed, QSizeF _size, QPointF _position, GameObject *_parent)
     : AbstractEntity(_size, _position, _parent)
@@ -13,6 +14,11 @@ void MovableEntity::setDirection(QPointF _ndirection)
 void MovableEntity::setSpeed(qreal _speed)
 {
     speed = std::min(maxSpeed, _speed);
+}
+
+void MovableEntity::setMaxSpeed(qreal _maxSpeed)
+{
+    maxSpeed = _maxSpeed;
 }
 
 void MovableEntity::setVelocity(QPointF _velocity)
@@ -34,6 +40,11 @@ qreal MovableEntity::getSpeed() const
 QPointF MovableEntity::getDirection() const
 {
     return direction;
+}
+
+qreal MovableEntity::getMaxSpeed() const
+{
+    return maxSpeed;
 }
 
 

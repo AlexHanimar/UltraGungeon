@@ -1,5 +1,6 @@
 #include <BasicObjects/AbstractHitbox.h>
 #include <tuple>
+#include <QDebug>
 
 AbstractHitbox::AbstractHitbox(QSizeF _size, QPointF _position, GameObject *_parent)
     : GameObject(_position, _parent)

@@ -40,9 +40,11 @@ std::vector<GameObject *> GameObject::getChildren() const
     return children;
 }
 
-GameObject::~GameObject()
+GameObject::~GameObject() noexcept
 {
+    qDebug() << 1;
     for(auto* child : children)
         delete child;
-    *std::find(parent->children.begin(), parent->children.end(), this) = nullptr;
+    if(parent != nullptr)
+        *std::find(parent->children.begin(), parent->children.end(), this) = nullptr;
 }

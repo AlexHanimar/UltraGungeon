@@ -9,4 +9,5 @@ protected:
 public:
     explicit AbstractEntity(QSizeF _size, QPointF _position = {0, 0}, GameObject* _parent = nullptr);
     [[nodiscard("AbstractEntity::getCollider() unused")]] virtual AbstractHitbox* getCollider() const;
+    virtual ~AbstractEntity() noexcept = default;
 };
