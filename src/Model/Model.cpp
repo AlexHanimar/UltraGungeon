@@ -34,4 +34,3 @@ void Model::setInputMask(int _inputMask)
 {
     inputMask = _inputMask;
 }
-

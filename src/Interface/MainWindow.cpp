@@ -4,13 +4,13 @@
 void GraphicsView::wheelEvent(QWheelEvent *event) {event->ignore();}
 
 MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
-    : millisecondsPerFrame(_millisecondsPerFrame)
-    , sceneSize(_sceneSize)
-    , scene(new QGraphicsScene(0, 0, sceneSize.width(), sceneSize.height(), this))
-    , view(new GraphicsView(scene))
-    , screenCenter(1000, 1000)
-    , inputMask(0)
-    , scale(1.0)
+        : millisecondsPerFrame(_millisecondsPerFrame)
+        , sceneSize(_sceneSize)
+        , scene(new QGraphicsScene(0, 0, sceneSize.width(), sceneSize.height(), this))
+        , view(new GraphicsView(scene))
+        , screenCenter(1000, 1000)
+        , inputMask(0)
+        , scale(1.0)
 {
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, [this](){this->onFrameStart();});
@@ -55,6 +55,10 @@ void MainWindow::paintEvent(QPaintEvent *)
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    // to exit application
+    if(event->key() == Qt::Key_Escape)
+        this->close();
+
     if(event->isAutoRepeat())
         return;
     switch(event->key()){
@@ -120,4 +124,3 @@ void MainWindow::wheelEvent(QWheelEvent *event)
     else
         scale = std::max(scale * factor, 0.125);
 }
-

@@ -9,14 +9,12 @@ AbstractInteraction *Wall_Wrapper::generateInteraction()
     inter->first = this;
     return inter;
 }
-
 AbstractInteraction *Door_Wrapper::generateInteraction()
 {
     auto* inter = new Door_Interaction;
     inter->first = this;
     return inter;
 }
-
 AbstractInteraction *MovableEntity_Wrapper::generateInteraction()
 {
     auto* inter = new MovableEntity_Interaction;
@@ -130,5 +128,6 @@ void interact(AbstractWrapper* a, AbstractWrapper* b)
 AbstractWrapper* wrap(Wall* item) {auto wrapper = new Wall_Wrapper; wrapper->item = item; return wrapper;}
 AbstractWrapper* wrap(Door* item) {auto wrapper = new Door_Wrapper; wrapper->item = item; return wrapper;}
 AbstractWrapper* wrap(MovableEntity* item) {auto wrapper = new MovableEntity_Wrapper; wrapper->item = item; return wrapper;}
+
 AbstractWrapper* wrap(qreal *timeItem) {auto wrapper = new Time_Wrapper; wrapper->item = timeItem; return wrapper;}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

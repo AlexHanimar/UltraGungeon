@@ -9,14 +9,14 @@
 #include <Interface/Renderer.h>
 
 class GraphicsView : public QGraphicsView {
-    Q_OBJECT
+Q_OBJECT
 public:
     using QGraphicsView::QGraphicsView;
     void wheelEvent(QWheelEvent* event) override;
 };
 
 class MainWindow : public QMainWindow {
-    Q_OBJECT
+Q_OBJECT
 private:
     int millisecondsPerFrame;
     QSize sceneSize;
