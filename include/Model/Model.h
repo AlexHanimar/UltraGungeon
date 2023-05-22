@@ -21,6 +21,7 @@ struct Time_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
     ~Time_Interaction();
 };
 AbstractWrapper* wrap(qreal* timeItem);
@@ -45,6 +46,7 @@ struct Input_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
     virtual ~Input_Interaction() override;
 };
 AbstractWrapper* wrap(int* inputItem, QPointF* mouseItem);
@@ -68,6 +70,7 @@ struct Spawn_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -88,6 +91,7 @@ struct Despawn_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

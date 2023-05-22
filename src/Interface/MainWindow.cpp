@@ -31,13 +31,13 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
     model->addEntity(wrap(entity));
     QPoint pos = {600, 500};
     for(int i = 0;i < 100;i++) {
-        auto* wall = new Wall({10, 10}, 1, 1, pos);
+        auto* wall = new Wall({10, 10}, 2, 2, pos);
         model->addEntity(wrap(wall));
         pos += {0, 10};
     }
     pos = {500, 600};
     for(int i = 0;i < 100;i++) {
-        auto* wall = new Wall({10, 10}, 1, 1, pos);
+        auto* wall = new Wall({10, 10}, 2, 2, pos);
         model->addEntity(wrap(wall));
         pos += {10, 0};
     }
@@ -46,12 +46,9 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
     player->init();
     model->setPlayerEntity(player);
 
-    auto* proj = new Projectile(100, {10, 10}, {800, 300});
-    proj->setTeam(TEAM::NEUTRAL);
-    proj->setState(Projectile::STATE::DEFAULT);
-    proj->setDamage(10);
-    proj->setVelocity({-100, 0});
-    model->addEntity(wrap(proj));
+    auto* enemy = new EnemyFilth(0, {10, 10}, {1200, 1200});
+    enemy->init();
+    model->addEntity(wrap(enemy));
 }
 
 void MainWindow::paintEvent(QPaintEvent *)

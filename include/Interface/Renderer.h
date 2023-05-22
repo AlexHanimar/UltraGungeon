@@ -22,5 +22,6 @@ struct Renderer_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
     virtual ~Renderer_Interaction() override;
 };

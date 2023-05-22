@@ -5,6 +5,7 @@
 #include <Entities/MovableEntity.h>
 #include <Entities/PlayerEntity.h>
 #include <Entities/Projectile.h>
+#include <Entities/EnemyFilth.h>
 
 struct AbstractWrapper;
 
@@ -13,6 +14,7 @@ struct Door_Wrapper;
 struct MovableEntity_Wrapper;
 struct PlayerEntity_Wrapper;
 struct Projectile_Wrapper;
+struct EnemyFilth_Wrapper;
 
 
 struct Wall_Interaction;
@@ -20,6 +22,7 @@ struct Door_Interaction;
 struct MovableEntity_Interaction;
 struct PlayerEntity_Interaction;
 struct Projectile_Interaction;
+struct EnemyFilth_Interaction;
 
 
 
@@ -31,6 +34,7 @@ struct AbstractInteraction {
     virtual void apply(MovableEntity_Wrapper *) = 0;
     virtual void apply(PlayerEntity_Wrapper *) = 0;
     virtual void apply(Projectile_Wrapper *) = 0;
+    virtual void apply(EnemyFilth_Wrapper *) = 0;
 
     virtual ~AbstractInteraction();
 };
@@ -76,6 +80,12 @@ struct Projectile_Wrapper : public AbstractWrapper {
     void accept(AbstractInteraction* interaction) override;
     virtual ~Projectile_Wrapper() override = default;
 };
+struct EnemyFilth_Wrapper : public AbstractWrapper {
+    EnemyFilth* item;
+    AbstractInteraction* generateInteraction() override;
+    void accept(AbstractInteraction* interaction) override;
+    virtual ~EnemyFilth_Wrapper() override = default;
+};
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // interactions
@@ -87,6 +97,7 @@ struct Wall_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
     virtual ~Wall_Interaction() override;
 };
 struct Door_Interaction : public AbstractInteraction {
@@ -96,6 +107,7 @@ struct Door_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
     virtual ~Door_Interaction() override;
 };
 struct MovableEntity_Interaction : public AbstractInteraction {
@@ -105,6 +117,7 @@ struct MovableEntity_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
     virtual ~MovableEntity_Interaction() override;
 };
 struct PlayerEntity_Interaction : public AbstractInteraction {
@@ -114,6 +127,7 @@ struct PlayerEntity_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
     virtual ~PlayerEntity_Interaction() override;
 };
 struct Projectile_Interaction : public AbstractInteraction {
@@ -123,7 +137,18 @@ struct Projectile_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
     virtual ~Projectile_Interaction() override;
+};
+struct EnemyFilth_Interaction : public AbstractInteraction {
+    EnemyFilth_Wrapper* first;
+    void apply(Wall_Wrapper* second) override;
+    void apply(Door_Wrapper* second) override;
+    void apply(MovableEntity_Wrapper* second) override;
+    void apply(PlayerEntity_Wrapper* second) override;
+    void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
+    virtual ~EnemyFilth_Interaction() override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -141,4 +166,5 @@ AbstractWrapper* wrap(Door* item);
 AbstractWrapper* wrap(MovableEntity* item);
 AbstractWrapper* wrap(PlayerEntity* item);
 AbstractWrapper* wrap(Projectile* item);
+AbstractWrapper* wrap(EnemyFilth* item);
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

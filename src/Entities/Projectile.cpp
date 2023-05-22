@@ -17,7 +17,7 @@ qreal Projectile::getDamage() const
     return damage;
 }
 
-void Projectile::setDamage(int _damage)
+void Projectile::setDamage(qreal _damage)
 {
     damage = _damage;
 }
@@ -54,7 +54,7 @@ Projectile* pistol2(QPointF pos, QPointF dir)
 {
     auto* res = new Projectile(500, {6, 6}, pos);
     res->setVelocity(normalize(dir) * 500.0);
-    res->setDamage(10);
+    res->setDamage(1.0);
     res->setTeam(TEAM::PLAYER);
     return res;
 }
@@ -64,7 +64,7 @@ Projectile* pellet(QPointF pos, QPointF dir)
     dir = normalize(dir);
     auto* res = new Projectile(300, {6, 6}, pos);
     res->setVelocity(dir * 500);
-    res->setDamage(5);
+    res->setDamage(0.5);
     res->setTeam(TEAM::PLAYER);
     return res;
 }

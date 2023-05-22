@@ -28,6 +28,10 @@ void Time_Interaction::apply(Projectile_Wrapper *second)
 {
     second->item->update(*first->item);
 }
+void Time_Interaction::apply(EnemyFilth_Wrapper *second)
+{
+    second->item->update(*first->item);
+}
 
 Time_Wrapper::~Time_Wrapper() {delete item;}
 Time_Interaction::~Time_Interaction() {}
@@ -111,6 +115,7 @@ void Input_Interaction::apply(PlayerEntity_Wrapper *second)
     }
 }
 void Input_Interaction::apply(Projectile_Wrapper *second) {}
+void Input_Interaction::apply(EnemyFilth_Wrapper *second) {}
 
 Input_Wrapper::~Input_Wrapper()
 {
@@ -200,6 +205,7 @@ void Spawn_Interaction::apply(PlayerEntity_Wrapper *second)
     }
 }
 void Spawn_Interaction::apply(Projectile_Wrapper *second) {}
+void Spawn_Interaction::apply(EnemyFilth_Wrapper *second) {}
 
 AbstractWrapper* wrap(std::vector<AbstractWrapper*>* item) {auto wrapper = new Spawn_Wrapper; wrapper->item = item; return wrapper;}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -222,6 +228,13 @@ void Despawn_Interaction::apply(PlayerEntity_Wrapper *second) {}
 void Despawn_Interaction::apply(Projectile_Wrapper *second)
 {
     if(second->item->getState() == Projectile::STATE::DESTROYED) {
+        delete second->item;
+        second->markedForDeletion = true;
+    }
+}
+void Despawn_Interaction::apply(EnemyFilth_Wrapper *second)
+{
+    if(second->item->getHealth() <= 0) {
         delete second->item;
         second->markedForDeletion = true;
     }

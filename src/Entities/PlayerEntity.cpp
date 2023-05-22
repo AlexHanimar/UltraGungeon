@@ -144,14 +144,20 @@ QPointF PlayerEntity::getSpawnDirection() const
     return spawnDirection;
 }
 
+qreal PlayerEntity::getMaxHealth() const
+{
+    return maxHealth;
+}
+
 void PlayerEntity::init()
 {
     defaultSpeed = 100.0;
     dashSpeed = 500.0;
     maxDashTimer = 0.1;
-    maxDashRechargeTimer = 1.0;
-    health = 100;
-    maxReloadTimer = {0.5, 1.0, 10.0};
+    maxDashRechargeTimer = 0.5;
+    health = 10.0;
+    maxHealth = 10.0;
+    maxReloadTimer = {0.35, 0.7, 10.0};
     reloadTimer = {0.0, 0.0, 0.0};
     weaponState = {PlayerEntity::WEAPON_STATE::READY, PlayerEntity::WEAPON_STATE::READY, PlayerEntity::WEAPON_STATE::READY};
     weapon = PlayerEntity::WEAPON::PISTOL;

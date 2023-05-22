@@ -14,7 +14,7 @@ public:
         DESTROYED = 1
     };
     using MovableEntity::MovableEntity;
-    void setDamage(int _damage);
+    void setDamage(qreal _damage);
     [[nodiscard("Projectile::getDamage() unused")]] qreal getDamage() const;
     void setTeam(TEAM _team);
     [[nodiscard("Projectile::getTeam() unused")]] TEAM getTeam() const;

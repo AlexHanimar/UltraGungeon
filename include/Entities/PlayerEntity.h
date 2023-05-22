@@ -14,6 +14,7 @@ private:
     qreal maxDashRechargeTimer; //
 
     qreal health; //
+    qreal maxHealth; //
 
     int weapon; //
     std::vector<int> weaponState; //
@@ -67,6 +68,8 @@ public:
 
     void setSpawnDirection(QPointF _spawnDirection);
     [[nodiscard("PlayerEntity::getSpawnDirection() unused")]] QPointF getSpawnDirection() const;
+
+    [[nodiscard("PlayerENtity::getMaxHealth() unused")]] qreal getMaxHealth(void) const;
 
     void init();
 };
