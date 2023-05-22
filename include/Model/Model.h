@@ -12,6 +12,7 @@ struct Time_Wrapper : public AbstractWrapper {
     qreal* item;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
+    ~Time_Wrapper();
 };
 struct Time_Interaction : public AbstractInteraction {
     Time_Wrapper* first;
@@ -20,6 +21,7 @@ struct Time_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    ~Time_Interaction();
 };
 AbstractWrapper* wrap(qreal* timeItem);
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -34,6 +36,7 @@ struct Input_Wrapper : public AbstractWrapper {
     QPointF* mouseDir;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
+    virtual ~Input_Wrapper() override;
 };
 struct Input_Interaction : public AbstractInteraction {
     Input_Wrapper* first;
@@ -42,6 +45,7 @@ struct Input_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    virtual ~Input_Interaction() override;
 };
 AbstractWrapper* wrap(int* inputItem, QPointF* mouseItem);
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

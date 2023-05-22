@@ -29,6 +29,9 @@ void Time_Interaction::apply(Projectile_Wrapper *second)
     second->item->update(*first->item);
 }
 
+Time_Wrapper::~Time_Wrapper() {delete item;}
+Time_Interaction::~Time_Interaction() {}
+
 AbstractWrapper* wrap(qreal *timeItem) {auto wrapper = new Time_Wrapper; wrapper->item = timeItem; return wrapper;}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -109,9 +112,21 @@ void Input_Interaction::apply(PlayerEntity_Wrapper *second)
 }
 void Input_Interaction::apply(Projectile_Wrapper *second) {}
 
+Input_Wrapper::~Input_Wrapper()
+{
+    item = nullptr;
+    delete item;
+    mouseDir = nullptr;
+    delete mouseDir;
+}
+Input_Interaction::~Input_Interaction()
+{
+    //delete first;
+}
+
 AbstractWrapper* wrap(int *inputItem, QPointF* mouseItem)
 {
-    auto wrapper = new Input_Wrapper;
+    auto* wrapper = new Input_Wrapper;
     wrapper->item = inputItem;
     wrapper->mouseDir = mouseItem;
     return wrapper;
@@ -230,10 +245,12 @@ void Model::update(qreal deltaT)
     // self update
     for(auto* entity : entities)
         interact(entity, entity);
-    // hard collisions
+    // paired interactions
     for(auto* entity1 : entities) {
-        for(auto* entity2 : entities)
-            interact(entity1, entity2);
+        for(auto* entity2 : entities) {
+            if(entity1 != entity2)
+                interact(entity1, entity2);
+        }
     }
     // player interactions
     for(auto* entity : entities) {

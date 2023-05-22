@@ -31,12 +31,16 @@ struct AbstractInteraction {
     virtual void apply(MovableEntity_Wrapper *) = 0;
     virtual void apply(PlayerEntity_Wrapper *) = 0;
     virtual void apply(Projectile_Wrapper *) = 0;
+
+    virtual ~AbstractInteraction();
 };
 
 struct AbstractWrapper {
     bool markedForDeletion = false;
     virtual AbstractInteraction *generateInteraction() = 0;
     virtual void accept(AbstractInteraction *interaction) = 0;
+
+    virtual ~AbstractWrapper();
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -46,26 +50,31 @@ struct Wall_Wrapper : public AbstractWrapper {
     Wall* item;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
+    virtual ~Wall_Wrapper() override = default;
 };
 struct Door_Wrapper : public AbstractWrapper {
     Door* item;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
+    virtual ~Door_Wrapper() override = default;
 };
 struct MovableEntity_Wrapper : public AbstractWrapper {
     MovableEntity* item;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
+    virtual ~MovableEntity_Wrapper() override = default;
 };
 struct PlayerEntity_Wrapper : public AbstractWrapper {
     PlayerEntity* item;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
+    virtual ~PlayerEntity_Wrapper() override = default;
 };
 struct Projectile_Wrapper : public AbstractWrapper {
     Projectile* item;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
+    virtual ~Projectile_Wrapper() override = default;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -78,6 +87,7 @@ struct Wall_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    virtual ~Wall_Interaction() override;
 };
 struct Door_Interaction : public AbstractInteraction {
     Door_Wrapper* first;
@@ -86,6 +96,7 @@ struct Door_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    virtual ~Door_Interaction() override;
 };
 struct MovableEntity_Interaction : public AbstractInteraction {
     MovableEntity_Wrapper* first;
@@ -94,6 +105,7 @@ struct MovableEntity_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    virtual ~MovableEntity_Interaction() override;
 };
 struct PlayerEntity_Interaction : public AbstractInteraction {
     PlayerEntity_Wrapper* first;
@@ -102,6 +114,7 @@ struct PlayerEntity_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    virtual ~PlayerEntity_Interaction() override;
 };
 struct Projectile_Interaction : public AbstractInteraction {
     Projectile_Wrapper* first;
@@ -110,6 +123,7 @@ struct Projectile_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    virtual ~Projectile_Interaction() override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

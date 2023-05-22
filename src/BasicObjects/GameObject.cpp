@@ -42,7 +42,6 @@ std::vector<GameObject *> GameObject::getChildren() const
 
 GameObject::~GameObject() noexcept
 {
-    qDebug() << 1;
     for(auto* child : children)
         delete child;
     if(parent != nullptr)

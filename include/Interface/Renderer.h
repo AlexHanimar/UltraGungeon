@@ -12,6 +12,7 @@ struct Renderer_Wrapper : public AbstractWrapper {
     qreal scale;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
+    virtual ~Renderer_Wrapper() override;
 };
 
 struct Renderer_Interaction : public AbstractInteraction {
@@ -21,4 +22,5 @@ struct Renderer_Interaction : public AbstractInteraction {
     void apply(MovableEntity_Wrapper* second) override;
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
+    virtual ~Renderer_Interaction() override;
 };

@@ -1,6 +1,9 @@
 #include <Model/EntityWrapper.h>
 #include <QDebug>
 
+AbstractWrapper::~AbstractWrapper() noexcept {}
+AbstractInteraction::~AbstractInteraction() noexcept {}
+
 // generating interactions
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 AbstractInteraction *Wall_Wrapper::generateInteraction()
@@ -176,12 +179,23 @@ void Projectile_Interaction::apply(PlayerEntity_Wrapper *second)
 void Projectile_Interaction::apply(Projectile_Wrapper *second) {}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+// interaction destructors
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+Wall_Interaction::~Wall_Interaction() noexcept {}
+Door_Interaction::~Door_Interaction() noexcept {}
+MovableEntity_Interaction::~MovableEntity_Interaction() noexcept {}
+PlayerEntity_Interaction::~PlayerEntity_Interaction() noexcept {}
+Projectile_Interaction::~Projectile_Interaction() noexcept {}
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
 // general interaction function
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 void interact(AbstractWrapper* a, AbstractWrapper* b)
 {
-    auto inter = a->generateInteraction();
+    auto* inter = a->generateInteraction();
     b->accept(inter);
+    delete inter;
 }
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

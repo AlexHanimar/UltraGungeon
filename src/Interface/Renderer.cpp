@@ -9,6 +9,15 @@ struct {
     QImage* Projectile_Sprite = new QImage("../../sprites/defaultSprite.png");
 } Sprites;
 
+Renderer_Interaction::~Renderer_Interaction() noexcept {}
+Renderer_Wrapper::~Renderer_Wrapper() noexcept
+{
+    scene = nullptr;
+    view = nullptr;
+    delete scene;
+    delete view;
+}
+
 AbstractInteraction *Renderer_Wrapper::generateInteraction()
 {
     auto* inter = new Renderer_Interaction;
