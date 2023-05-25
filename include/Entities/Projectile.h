@@ -4,7 +4,7 @@
 #include <Entities/Teams.h>
 
 class Projectile : public MovableEntity {
-private:
+protected:
     int state;
     qreal damage;
     TEAM team;
@@ -14,12 +14,12 @@ public:
         DESTROYED = 1
     };
     using MovableEntity::MovableEntity;
-    void setDamage(qreal _damage);
-    [[nodiscard("Projectile::getDamage() unused")]] qreal getDamage() const;
+    virtual void setDamage(qreal _damage);
+    [[nodiscard("Projectile::getDamage() unused")]] virtual qreal getDamage() const;
     void setTeam(TEAM _team);
-    [[nodiscard("Projectile::getTeam() unused")]] TEAM getTeam() const;
-    void setState(int _state);
-    [[nodiscard("Projectile::getState() unused")]] int getState() const;
+    [[nodiscard("Projectile::getTeam() unused")]] virtual TEAM getTeam() const;
+    virtual void setState(int _state);
+    [[nodiscard("Projectile::getState() unused")]] virtual int getState() const;
 
     virtual ~Projectile() noexcept = default;
 };

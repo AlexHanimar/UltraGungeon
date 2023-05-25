@@ -49,6 +49,19 @@ AbstractInteraction *EnemyAndre_Wrapper::generateInteraction()
     inter->first = this;
     return inter;
 }
+
+AbstractInteraction *Trigger_Wrapper::generateInteraction()
+{
+    auto* inter = new Trigger_Interaction;
+    inter->first = this;
+    return inter;
+}
+AbstractInteraction *Hitscan_Wrapper::generateInteraction()
+{
+    auto* inter = new Hitscan_Interaction;
+    inter->first = this;
+    return inter;
+}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // accepting interactions
@@ -78,6 +91,14 @@ void EnemyFilth_Wrapper::accept(AbstractInteraction *interaction)
     interaction->apply(this);
 }
 void EnemyAndre_Wrapper::accept(AbstractInteraction *interaction)
+{
+    interaction->apply(this);
+}
+void Trigger_Wrapper::accept(AbstractInteraction *interaction)
+{
+    interaction->apply(this);
+}
+void Hitscan_Wrapper::accept(AbstractInteraction *interaction)
 {
     interaction->apply(this);
 }
@@ -128,6 +149,8 @@ void Wall_Interaction::apply(EnemyAndre_Wrapper *second)
 {
     interact(wrap(first->item), wrap(static_cast<MovableEntity*>(second->item)));
 }
+void Wall_Interaction::apply(Trigger_Wrapper *second) {}
+void Wall_Interaction::apply(Hitscan_Wrapper *second) {}
 
 void Door_Interaction::apply(Wall_Wrapper *second) {}
 void Door_Interaction::apply(Door_Wrapper *second) {}
@@ -174,6 +197,8 @@ void Door_Interaction::apply(EnemyAndre_Wrapper *second)
 {
     interact(wrap(first->item), wrap(static_cast<MovableEntity*>(second->item)));
 }
+void Door_Interaction::apply(Trigger_Wrapper *second) {}
+void Door_Interaction::apply(Hitscan_Wrapper *second) {}
 
 void MovableEntity_Interaction::apply(Wall_Wrapper *second) {}
 void MovableEntity_Interaction::apply(Door_Wrapper *second) {}
@@ -182,6 +207,8 @@ void MovableEntity_Interaction::apply(PlayerEntity_Wrapper *second) {}
 void MovableEntity_Interaction::apply(Projectile_Wrapper *second) {}
 void MovableEntity_Interaction::apply(EnemyFilth_Wrapper *second) {}
 void MovableEntity_Interaction::apply(EnemyAndre_Wrapper *second) {}
+void MovableEntity_Interaction::apply(Trigger_Wrapper *second) {}
+void MovableEntity_Interaction::apply(Hitscan_Wrapper *second) {}
 
 void PlayerEntity_Interaction::apply(Wall_Wrapper *second) {}
 void PlayerEntity_Interaction::apply(Door_Wrapper *second) {}
@@ -196,6 +223,8 @@ void PlayerEntity_Interaction::apply(EnemyAndre_Wrapper *second)
 {
     second->item->setDestination(first->item->getAbsolutePosition());
 }
+void PlayerEntity_Interaction::apply(Trigger_Wrapper *second) {}
+void PlayerEntity_Interaction::apply(Hitscan_Wrapper *second) {}
 
 void Projectile_Interaction::apply(Wall_Wrapper *second) {}
 void Projectile_Interaction::apply(Door_Wrapper *second) {}
@@ -236,6 +265,8 @@ void Projectile_Interaction::apply(EnemyAndre_Wrapper *second)
         first->item->setState(Projectile::STATE::DESTROYED);
     }
 }
+void Projectile_Interaction::apply(Trigger_Wrapper *second) {}
+void Projectile_Interaction::apply(Hitscan_Wrapper *second) {}
 
 void EnemyFilth_Interaction::apply(Wall_Wrapper *second) {}
 void EnemyFilth_Interaction::apply(Door_Wrapper *second) {}
@@ -252,6 +283,8 @@ void EnemyFilth_Interaction::apply(PlayerEntity_Wrapper *second)
 void EnemyFilth_Interaction::apply(Projectile_Wrapper *second) {}
 void EnemyFilth_Interaction::apply(EnemyFilth_Wrapper *second) {}
 void EnemyFilth_Interaction::apply(EnemyAndre_Wrapper *second) {}
+void EnemyFilth_Interaction::apply(Trigger_Wrapper *second) {}
+void EnemyFilth_Interaction::apply(Hitscan_Wrapper *second) {}
 
 void EnemyAndre_Interaction::apply(Wall_Wrapper *second) {}
 void EnemyAndre_Interaction::apply(Door_Wrapper *second) {}
@@ -260,7 +293,7 @@ void EnemyAndre_Interaction::apply(PlayerEntity_Wrapper *second)
 {
     if(second->item->getState() == PlayerEntity::STATE::DASHING)
         return;
-    if(first->item->getCollider()->intersects(second->item->getCollider())) {
+    if(first->item->hitboxIsActive() && first->item->getCollider()->intersects(second->item->getCollider())) {
         second->item->applyDamage(first->item->getDamage());
         first->item->setHitboxActive(false);
     }
@@ -268,7 +301,48 @@ void EnemyAndre_Interaction::apply(PlayerEntity_Wrapper *second)
 void EnemyAndre_Interaction::apply(Projectile_Wrapper *second) {}
 void EnemyAndre_Interaction::apply(EnemyFilth_Wrapper *second) {}
 void EnemyAndre_Interaction::apply(EnemyAndre_Wrapper *second) {}
+void EnemyAndre_Interaction::apply(Trigger_Wrapper *second) {}
+void EnemyAndre_Interaction::apply(Hitscan_Wrapper *second) {}
 
+void Trigger_Interaction::apply(Wall_Wrapper *second) {}
+void Trigger_Interaction::apply(Door_Wrapper *second)
+{
+    second->item->setActive(first->item->isTriggered());
+}
+void Trigger_Interaction::apply(MovableEntity_Wrapper *second) {}
+void Trigger_Interaction::apply(PlayerEntity_Wrapper *second)
+{
+    if(first->item->intersects(second->item->getCollider()))
+        first->item->setTriggered(true);
+}
+void Trigger_Interaction::apply(Projectile_Wrapper *second) {}
+void Trigger_Interaction::apply(EnemyFilth_Wrapper *second) {}
+void Trigger_Interaction::apply(EnemyAndre_Wrapper *second) {}
+void Trigger_Interaction::apply(Trigger_Wrapper *second) {}
+void Trigger_Interaction::apply(Hitscan_Wrapper *second) {}
+
+void Hitscan_Interaction::apply(Wall_Wrapper *second)
+{
+    first->item->addPierce(second->item->getCollider());
+}
+void Hitscan_Interaction::apply(Door_Wrapper *second)
+{
+    if(second->item->isActive())
+        first->item->addPierce(second->item->getCollider());
+}
+void Hitscan_Interaction::apply(MovableEntity_Wrapper *second) {}
+void Hitscan_Interaction::apply(PlayerEntity_Wrapper *second) {}
+void Hitscan_Interaction::apply(Projectile_Wrapper *second) {}
+void Hitscan_Interaction::apply(EnemyFilth_Wrapper *second)
+{
+    first->item->addPierce(second->item->getCollider());
+}
+void Hitscan_Interaction::apply(EnemyAndre_Wrapper *second)
+{
+    first->item->addPierce(second->item->getCollider());
+}
+void Hitscan_Interaction::apply(Trigger_Wrapper *second) {}
+void Hitscan_Interaction::apply(Hitscan_Wrapper *second) {}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // interaction destructors
@@ -280,6 +354,8 @@ PlayerEntity_Interaction::~PlayerEntity_Interaction() noexcept {}
 Projectile_Interaction::~Projectile_Interaction() noexcept {}
 EnemyFilth_Interaction::~EnemyFilth_Interaction() noexcept {}
 EnemyAndre_Interaction::~EnemyAndre_Interaction() noexcept {}
+Trigger_Interaction::~Trigger_Interaction() noexcept {}
+Hitscan_Interaction::~Hitscan_Interaction() noexcept {}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -302,4 +378,6 @@ AbstractWrapper* wrap(PlayerEntity* item) {auto wrapper = new PlayerEntity_Wrapp
 AbstractWrapper* wrap(Projectile* item) {auto wrapper = new Projectile_Wrapper; wrapper->item = item; return wrapper;}
 AbstractWrapper* wrap(EnemyFilth* item) {auto wrapper = new EnemyFilth_Wrapper; wrapper->item = item; return wrapper;}
 AbstractWrapper* wrap(EnemyAndre* item) {auto wrapper = new EnemyAndre_Wrapper; wrapper->item = item; return wrapper;}
+AbstractWrapper* wrap(Trigger* item) {auto wrapper = new Trigger_Wrapper; wrapper->item = item; return wrapper;}
+AbstractWrapper* wrap(Hitscan* item) {auto wrapper = new Hitscan_Wrapper; wrapper->item = item; return wrapper;}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

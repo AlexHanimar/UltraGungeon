@@ -72,19 +72,17 @@ void EnemyAndre::setState(int _state)
             }
             break;
         case EnemyAndre::STATE::RECOVERY:
+            setHitboxActive(false);
+            setMaxSpeed(recoverySpeed);
+            setDirection(destination - getAbsolutePosition());
+            setSpeed(recoverySpeed);
             if(state == EnemyAndre::STATE::DASHING) {
-                setHitboxActive(false);
-                setMaxSpeed(recoverySpeed);
-                setSpeed(recoverySpeed);
                 recoveryTimer = maxRecoveryTimer;
                 state = _state;
             }
             else if(state == EnemyAndre::STATE::SHOOTING) {
                 setSpawnAction(EnemyAndre::SPAWN_ACTION::BALL);
                 setSpawnDirection(destination - getAbsolutePosition());
-                setMaxSpeed(recoverySpeed);
-                setSpeed(recoverySpeed);
-                setDirection(destination - getAbsolutePosition());
                 recoveryTimer = maxRecoveryTimer;
                 state = _state;
             }
@@ -139,8 +137,8 @@ void EnemyAndre::init()
     recoverySpeed = 30.0;
     dashSpeed = 500.0;
 
-    maxDashTimer = 0.1;
-    maxRecoveryTimer = 1.0;
+    maxDashTimer = 0.5;
+    maxRecoveryTimer = 3.0;
     maxChargeUpTimer = 0.5;
     dashRadius = 200.0;
 

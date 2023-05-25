@@ -36,6 +36,11 @@ void Time_Interaction::apply(EnemyAndre_Wrapper *second)
 {
     second->item->update(*first->item);
 }
+void Time_Interaction::apply(Trigger_Wrapper *second) {}
+void Time_Interaction::apply(Hitscan_Wrapper *second)
+{
+    second->item->update(*first->item);
+}
 
 Time_Wrapper::~Time_Wrapper() {delete item;}
 Time_Interaction::~Time_Interaction() {}
@@ -121,6 +126,8 @@ void Input_Interaction::apply(PlayerEntity_Wrapper *second)
 void Input_Interaction::apply(Projectile_Wrapper *second) {}
 void Input_Interaction::apply(EnemyFilth_Wrapper *second) {}
 void Input_Interaction::apply(EnemyAndre_Wrapper *second) {}
+void Input_Interaction::apply(Trigger_Wrapper *second) {}
+void Input_Interaction::apply(Hitscan_Wrapper *second) {}
 
 Input_Wrapper::~Input_Wrapper()
 {
@@ -165,8 +172,9 @@ void Spawn_Interaction::apply(PlayerEntity_Wrapper *second)
         case PlayerEntity::SPAWN_ACTION::PISTOL_1:
         {
             second->item->setWeaponState(PlayerEntity::WEAPON_STATE::RELOADING);
-            auto* projectile = pistol1(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
-            first->item->push_back(wrap(projectile));
+            auto* hitscan = _pistol1(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
+            //auto* projectile = pistol1(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
+            first->item->push_back(wrap(hitscan));
         }
             break;
         case PlayerEntity::SPAWN_ACTION::PISTOL_2:
@@ -227,6 +235,8 @@ void Spawn_Interaction::apply(EnemyAndre_Wrapper *second)
             break;
     }
 }
+void Spawn_Interaction::apply(Trigger_Wrapper *second) {}
+void Spawn_Interaction::apply(Hitscan_Wrapper *second) {}
 
 AbstractWrapper* wrap(std::vector<AbstractWrapper*>* item) {auto wrapper = new Spawn_Wrapper; wrapper->item = item; return wrapper;}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -267,6 +277,14 @@ void Despawn_Interaction::apply(EnemyAndre_Wrapper *second)
         second->markedForDeletion = true;
     }
 }
+void Despawn_Interaction::apply(Trigger_Wrapper *second) {}
+void Despawn_Interaction::apply(Hitscan_Wrapper *second)
+{
+    if(second->item->getState() == Hitscan::STATE::DESTROYED) {
+        delete second->item;
+        second->markedForDeletion = true;
+    }
+}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Model::Model()
@@ -275,6 +293,14 @@ Model::Model()
 
 void Model::update(qreal deltaT)
 {
+    // triggers
+    for(auto* trigger : triggers) {
+        interact(trigger, playerEntity);
+        for(auto* entity : dynamicEntities)
+            interact(trigger, entity);
+        for(auto* entity : staticEntities)
+            interact(trigger, entity);
+    }
     // updating input
     auto* inputWrapper = wrap(&inputMask, &mouseDirection);
     interact(inputWrapper, playerEntity);
@@ -292,8 +318,10 @@ void Model::update(qreal deltaT)
         interact(entity, entity);
     // paired interactions
     for(auto* staticEntity : staticEntities) {
-        for(auto* dynamicEntity : dynamicEntities)
+        for(auto* dynamicEntity : dynamicEntities) {
             interact(staticEntity, dynamicEntity);
+            interact(dynamicEntity, staticEntity);
+        }
     }
     for(auto* entity1 : dynamicEntities) {
         for(auto* entity2 : dynamicEntities) {
@@ -335,6 +363,11 @@ void Model::addDynamicEntity(AbstractWrapper *entity)
     dynamicEntities.push_back(entity);
 }
 
+void Model::addTrigger(AbstractWrapper *trigger)
+{
+    triggers.push_back(trigger);
+}
+
 std::vector<AbstractWrapper *> &Model::getStaticEntities()
 {
     return staticEntities;
@@ -343,6 +376,11 @@ std::vector<AbstractWrapper *> &Model::getStaticEntities()
 std::vector<AbstractWrapper *> &Model::getDynamicEntities()
 {
     return dynamicEntities;
+}
+
+std::vector<AbstractWrapper *> &Model::getTriggers()
+{
+    return triggers;
 }
 
 void Model::setInputMask(int _inputMask)

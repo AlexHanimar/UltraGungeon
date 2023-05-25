@@ -7,6 +7,8 @@
 #include <Entities/Projectile.h>
 #include <Entities/EnemyFilth.h>
 #include <Entities/EnemyAndre.h>
+#include <Entities/Trigger.h>
+#include <Entities/Hitscan.h>
 
 struct AbstractWrapper;
 
@@ -17,6 +19,8 @@ struct PlayerEntity_Wrapper;
 struct Projectile_Wrapper;
 struct EnemyFilth_Wrapper;
 struct EnemyAndre_Wrapper;
+struct Trigger_Wrapper;
+struct Hitscan_Wrapper;
 
 
 struct Wall_Interaction;
@@ -26,6 +30,8 @@ struct PlayerEntity_Interaction;
 struct Projectile_Interaction;
 struct EnemyFilth_Interaction;
 struct EnemyAndre_Interaction;
+struct Trigger_Interaction;
+struct Hitscan_interaction;
 
 
 
@@ -39,6 +45,8 @@ struct AbstractInteraction {
     virtual void apply(Projectile_Wrapper *) = 0;
     virtual void apply(EnemyFilth_Wrapper *) = 0;
     virtual void apply(EnemyAndre_Wrapper *) = 0;
+    virtual void apply(Trigger_Wrapper *)  = 0;
+    virtual void apply(Hitscan_Wrapper *) = 0;
 
     virtual ~AbstractInteraction();
 };
@@ -96,6 +104,18 @@ struct EnemyAndre_Wrapper : public AbstractWrapper {
     void accept(AbstractInteraction* interaction) override;
     virtual ~EnemyAndre_Wrapper() override = default;
 };
+struct Trigger_Wrapper : public AbstractWrapper {
+    Trigger* item;
+    AbstractInteraction* generateInteraction() override;
+    void accept(AbstractInteraction* interaction) override;
+    virtual ~Trigger_Wrapper() override = default;
+};
+struct Hitscan_Wrapper : public AbstractWrapper {
+    Hitscan* item;
+    AbstractInteraction* generateInteraction() override;
+    void accept(AbstractInteraction* interaction) override;
+    virtual ~Hitscan_Wrapper() override = default;
+};
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // interactions
@@ -109,6 +129,8 @@ struct Wall_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
     virtual ~Wall_Interaction() override;
 };
 struct Door_Interaction : public AbstractInteraction {
@@ -120,6 +142,8 @@ struct Door_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
     virtual ~Door_Interaction() override;
 };
 struct MovableEntity_Interaction : public AbstractInteraction {
@@ -131,6 +155,8 @@ struct MovableEntity_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
     virtual ~MovableEntity_Interaction() override;
 };
 struct PlayerEntity_Interaction : public AbstractInteraction {
@@ -142,6 +168,8 @@ struct PlayerEntity_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
     virtual ~PlayerEntity_Interaction() override;
 };
 struct Projectile_Interaction : public AbstractInteraction {
@@ -153,6 +181,8 @@ struct Projectile_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
     virtual ~Projectile_Interaction() override;
 };
 struct EnemyFilth_Interaction : public AbstractInteraction {
@@ -164,6 +194,8 @@ struct EnemyFilth_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
     virtual ~EnemyFilth_Interaction() override;
 };
 struct EnemyAndre_Interaction : public AbstractInteraction {
@@ -175,7 +207,35 @@ struct EnemyAndre_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
     virtual ~EnemyAndre_Interaction() override;
+};
+struct Trigger_Interaction : public AbstractInteraction {
+    Trigger_Wrapper* first;
+    void apply(Wall_Wrapper* second) override;
+    void apply(Door_Wrapper* second) override;
+    void apply(MovableEntity_Wrapper* second) override;
+    void apply(PlayerEntity_Wrapper* second) override;
+    void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
+    void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
+    virtual ~Trigger_Interaction() override;
+};
+struct Hitscan_Interaction : public AbstractInteraction {
+    Hitscan_Wrapper* first;
+    void apply(Wall_Wrapper* second) override;
+    void apply(Door_Wrapper* second) override;
+    void apply(MovableEntity_Wrapper* second) override;
+    void apply(PlayerEntity_Wrapper* second) override;
+    void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
+    void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
+    virtual ~Hitscan_Interaction() override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -195,4 +255,6 @@ AbstractWrapper* wrap(PlayerEntity* item);
 AbstractWrapper* wrap(Projectile* item);
 AbstractWrapper* wrap(EnemyFilth* item);
 AbstractWrapper* wrap(EnemyAndre* item);
+AbstractWrapper* wrap(Trigger* item);
+AbstractWrapper* wrap(Hitscan* item);
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

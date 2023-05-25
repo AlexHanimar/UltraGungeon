@@ -23,6 +23,7 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
     view->setFixedSize(this->size());
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setViewportUpdateMode(QGraphicsView::ViewportUpdateMode::NoViewportUpdate); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     screenCenter = {this->size().width() / 2, this->size().height() / 2};
     this->setMouseTracking(true);
 
@@ -46,9 +47,16 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
     player->init();
     model->setPlayerEntity(player);
 
-    auto* enemy = new EnemyAndre(0, {50, 50}, {1200, 1200});
+    auto* enemy = new EnemyAndre(0, {30, 30}, {1200, 1200});
     enemy->init();
     model->addDynamicEntity(wrap(enemy));
+
+    auto* trigger = new Trigger({200, 200}, {1200, 1200});
+    model->addTrigger(wrap(trigger));
+
+    auto* door = new Door({100, 100}, 2, 2, {1200, 800});
+    door->setActive(false);
+    model->addStaticEntity(wrap(door));
 }
 
 void MainWindow::paintEvent(QPaintEvent *)
@@ -62,8 +70,11 @@ void MainWindow::paintEvent(QPaintEvent *)
         interact(renderer, entity);
     for(auto* entity : model->getStaticEntities())
         interact(renderer, entity);
+    for(auto* entity : model->getTriggers())
+        interact(renderer, entity);
     interact(renderer, model->getPlayerEntity());
     delete renderer;
+    view->viewport()->update();
     this->setCentralWidget(view);
     centralWidget()->setAttribute(Qt::WA_TransparentForMouseEvents);
 }

@@ -8,6 +8,8 @@ set(HEADER_LIST
         ../../include/Entities/AbstractEnemy.h
         ../../include/Entities/EnemyFilth.h
         ../../include/Entities/EnemyAndre.h
+        ../../include/Entities/Trigger.h
+        ../../include/Entities/Hitscan.h
         )
 
 set(SOURCE_LIST
@@ -19,6 +21,8 @@ set(SOURCE_LIST
         AbstractEnemy.cpp
         EnemyFilth.cpp
         EnemyAndre.cpp
+        Trigger.cpp
+        Hitscan.cpp
         )
 
 add_library(Entities ${SOURCE_LIST} ${HEADER_LIST})

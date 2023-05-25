@@ -23,6 +23,8 @@ struct Time_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
     ~Time_Interaction();
 };
 AbstractWrapper* wrap(qreal* timeItem);
@@ -49,6 +51,8 @@ struct Input_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
     virtual ~Input_Interaction() override;
 };
 AbstractWrapper* wrap(int* inputItem, QPointF* mouseItem);
@@ -74,6 +78,8 @@ struct Spawn_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -96,6 +102,8 @@ struct Despawn_Interaction : public AbstractInteraction {
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
     void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -116,24 +124,26 @@ class Model {
 protected:
     int inputMask;
     QPointF mouseDirection;
-    std::vector<AbstractWrapper*> entities;
     AbstractWrapper* playerEntity;
     AbstractWrapper* spawnWrapper;
     AbstractWrapper* despawnWrapper;
 
     std::vector<AbstractWrapper*> staticEntities;
     std::vector<AbstractWrapper*> dynamicEntities;
+    std::vector<AbstractWrapper*> triggers;
 public:
     Model();
     void update(qreal deltaT);
     std::vector<AbstractWrapper*>& getStaticEntities();
     std::vector<AbstractWrapper*>& getDynamicEntities();
+    std::vector<AbstractWrapper*>& getTriggers();
     [[nodiscard("Model::getPlayerEntity() unused")]] AbstractWrapper* getPlayerEntity() const;
 
     void setPlayerEntity(PlayerEntity* player);
 
     void addStaticEntity(AbstractWrapper* entity);
     void addDynamicEntity(AbstractWrapper* entity);
+    void addTrigger(AbstractWrapper* trigger);
 
     void setInputMask(int _inputMask);
     void setMouseDirection(QPointF _mouseDirection);

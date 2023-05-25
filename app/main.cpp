@@ -6,6 +6,7 @@
 #include <Model/Model.h>
 #include <Interface/MainWindow.h>
 #include <Entities/Projectile.h>
+#include <Entities/Hitscan.h>
 
 using namespace std;
 

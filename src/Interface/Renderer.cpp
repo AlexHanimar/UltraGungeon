@@ -41,8 +41,9 @@ void Renderer_Interaction::apply(Wall_Wrapper *second)
 void Renderer_Interaction::apply(Door_Wrapper *second)
 {
     auto* img = Sprites.Wall_Sprite;
-    QPoint dPos = QPoint(-img->width() * 0.5, -img->height() * 0.5);
-    auto* item = first->scene->addPixmap(QPixmap::fromImage(*img));
+    QImage img2 = img->scaled(second->item->getCollider()->getSize().width(), second->item->getCollider()->getSize().height());
+    QPoint dPos = QPoint(-img2.width() * 0.5, -img2.height() * 0.5);
+    auto* item = first->scene->addPixmap(QPixmap::fromImage(img2));
     item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
     item->setScale(first->scale);
 }
@@ -101,5 +102,24 @@ void Renderer_Interaction::apply(EnemyAndre_Wrapper *second)
     QPoint dPos = QPoint(-img2.width() * 0.5, -img2.height() * 0.5);
     auto* item = first->scene->addPixmap(QPixmap::fromImage(img2));
     item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
+    item->setScale(first->scale);
+}
+
+void Renderer_Interaction::apply(Trigger_Wrapper *second)
+{
+    auto col = Qt::green;
+    if(second->item->isTriggered())
+        col = Qt::red;
+    QPoint dPos = QPoint(-second->item->getSize().width() * 0.5, -second->item->getSize().height() * 0.5);
+    QRect rect(dPos + QPoint(second->item->getAbsolutePosition().x(), second->item->getAbsolutePosition().y()),
+               QSize(second->item->getSize().width(), second->item->getSize().height()));
+    auto* item = first->scene->addRect(rect, QPen(col));
+    item->setScale(first->scale);
+}
+
+void Renderer_Interaction::apply(Hitscan_Wrapper *second)
+{
+    auto col = Qt::yellow;
+    auto* item = first->scene->addLine(QLineF(second->item->getStartPoint(), second->item->getEndpoint()), QPen(col, 3));
     item->setScale(first->scale);
 }
