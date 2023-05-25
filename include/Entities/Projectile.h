@@ -30,3 +30,5 @@ std::vector<Projectile*> shotgun1(QPointF pos, QPointF dir);
 Projectile* shotgun2(QPointF pos, QPointF dir);
 Projectile* railgun1(QPointF pos, QPointF dir);
 Projectile* railgun2(QPointF pos, QPointF dir);
+
+Projectile* andreBall(QPointF pos, QPointF dir);

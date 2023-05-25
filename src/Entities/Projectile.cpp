@@ -90,3 +90,12 @@ Projectile* railgun2(QPointF pos, QPointF dir)
 {
     return pistol1(pos, dir);
 }
+
+Projectile* andreBall(QPointF pos, QPointF dir)
+{
+    auto* res = new Projectile(1000, {10, 10}, pos);
+    res->setDamage(5);
+    res->setVelocity(normalize(dir) * 1000);
+    res->setTeam(TEAM::ENEMY);
+    return res;
+}

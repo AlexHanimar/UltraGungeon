@@ -7,6 +7,7 @@ set(HEADER_LIST
         ../../include/Entities/Teams.h
         ../../include/Entities/AbstractEnemy.h
         ../../include/Entities/EnemyFilth.h
+        ../../include/Entities/EnemyAndre.h
         )
 
 set(SOURCE_LIST
@@ -17,6 +18,7 @@ set(SOURCE_LIST
         Projectile.cpp
         AbstractEnemy.cpp
         EnemyFilth.cpp
+        EnemyAndre.cpp
         )
 
 add_library(Entities ${SOURCE_LIST} ${HEADER_LIST})

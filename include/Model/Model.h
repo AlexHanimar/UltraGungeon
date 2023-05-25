@@ -22,6 +22,7 @@ struct Time_Interaction : public AbstractInteraction {
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
+    void apply(EnemyAndre_Wrapper* second) override;
     ~Time_Interaction();
 };
 AbstractWrapper* wrap(qreal* timeItem);
@@ -47,6 +48,7 @@ struct Input_Interaction : public AbstractInteraction {
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
+    void apply(EnemyAndre_Wrapper* second) override;
     virtual ~Input_Interaction() override;
 };
 AbstractWrapper* wrap(int* inputItem, QPointF* mouseItem);
@@ -71,6 +73,7 @@ struct Spawn_Interaction : public AbstractInteraction {
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
+    void apply(EnemyAndre_Wrapper* second) override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -92,6 +95,7 @@ struct Despawn_Interaction : public AbstractInteraction {
     void apply(PlayerEntity_Wrapper* second) override;
     void apply(Projectile_Wrapper* second) override;
     void apply(EnemyFilth_Wrapper* second) override;
+    void apply(EnemyAndre_Wrapper* second) override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -116,15 +120,20 @@ protected:
     AbstractWrapper* playerEntity;
     AbstractWrapper* spawnWrapper;
     AbstractWrapper* despawnWrapper;
+
+    std::vector<AbstractWrapper*> staticEntities;
+    std::vector<AbstractWrapper*> dynamicEntities;
 public:
     Model();
     void update(qreal deltaT);
-    [[nodiscard("Model::getEntities() unused")]] std::vector<AbstractWrapper*> getEntities() const;
+    std::vector<AbstractWrapper*>& getStaticEntities();
+    std::vector<AbstractWrapper*>& getDynamicEntities();
     [[nodiscard("Model::getPlayerEntity() unused")]] AbstractWrapper* getPlayerEntity() const;
 
     void setPlayerEntity(PlayerEntity* player);
 
-    void addEntity(AbstractWrapper* entity);
+    void addStaticEntity(AbstractWrapper* entity);
+    void addDynamicEntity(AbstractWrapper* entity);
 
     void setInputMask(int _inputMask);
     void setMouseDirection(QPointF _mouseDirection);

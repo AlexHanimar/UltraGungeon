@@ -28,17 +28,17 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
 
     auto* entity = new MovableEntity(100, {10, 10}, {500, 500});
     entity->setVelocity({100, 100});
-    model->addEntity(wrap(entity));
+    model->addDynamicEntity(wrap(entity));
     QPoint pos = {600, 500};
     for(int i = 0;i < 100;i++) {
         auto* wall = new Wall({10, 10}, 2, 2, pos);
-        model->addEntity(wrap(wall));
+        model->addStaticEntity(wrap(wall));
         pos += {0, 10};
     }
     pos = {500, 600};
     for(int i = 0;i < 100;i++) {
         auto* wall = new Wall({10, 10}, 2, 2, pos);
-        model->addEntity(wrap(wall));
+        model->addStaticEntity(wrap(wall));
         pos += {10, 0};
     }
 
@@ -46,9 +46,9 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
     player->init();
     model->setPlayerEntity(player);
 
-    auto* enemy = new EnemyFilth(0, {10, 10}, {1200, 1200});
+    auto* enemy = new EnemyAndre(0, {50, 50}, {1200, 1200});
     enemy->init();
-    model->addEntity(wrap(enemy));
+    model->addDynamicEntity(wrap(enemy));
 }
 
 void MainWindow::paintEvent(QPaintEvent *)
@@ -58,7 +58,9 @@ void MainWindow::paintEvent(QPaintEvent *)
     renderer->scale = scale;
     renderer->scene = scene;
     renderer->view = view;
-    for(auto* entity : model->getEntities())
+    for(auto* entity : model->getDynamicEntities())
+        interact(renderer, entity);
+    for(auto* entity : model->getStaticEntities())
         interact(renderer, entity);
     interact(renderer, model->getPlayerEntity());
     delete renderer;

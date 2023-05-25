@@ -69,7 +69,7 @@ public:
     void setSpawnDirection(QPointF _spawnDirection);
     [[nodiscard("PlayerEntity::getSpawnDirection() unused")]] QPointF getSpawnDirection() const;
 
-    [[nodiscard("PlayerENtity::getMaxHealth() unused")]] qreal getMaxHealth(void) const;
+    [[nodiscard("PlayerENtity::getMaxHealth() unused")]] qreal getMaxHealth() const;
 
     void init();
 };

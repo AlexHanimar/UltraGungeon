@@ -32,6 +32,10 @@ void Time_Interaction::apply(EnemyFilth_Wrapper *second)
 {
     second->item->update(*first->item);
 }
+void Time_Interaction::apply(EnemyAndre_Wrapper *second)
+{
+    second->item->update(*first->item);
+}
 
 Time_Wrapper::~Time_Wrapper() {delete item;}
 Time_Interaction::~Time_Interaction() {}
@@ -116,6 +120,7 @@ void Input_Interaction::apply(PlayerEntity_Wrapper *second)
 }
 void Input_Interaction::apply(Projectile_Wrapper *second) {}
 void Input_Interaction::apply(EnemyFilth_Wrapper *second) {}
+void Input_Interaction::apply(EnemyAndre_Wrapper *second) {}
 
 Input_Wrapper::~Input_Wrapper()
 {
@@ -206,6 +211,22 @@ void Spawn_Interaction::apply(PlayerEntity_Wrapper *second)
 }
 void Spawn_Interaction::apply(Projectile_Wrapper *second) {}
 void Spawn_Interaction::apply(EnemyFilth_Wrapper *second) {}
+void Spawn_Interaction::apply(EnemyAndre_Wrapper *second)
+{
+    switch(second->item->getSpawnAction()) {
+        case EnemyAndre::SPAWN_ACTION::NONE:
+            break;
+        case EnemyAndre::SPAWN_ACTION::BALL:
+        {
+            auto* projectile = andreBall(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
+            first->item->push_back(wrap(projectile));
+            second->item->setSpawnAction(EnemyAndre::SPAWN_ACTION::NONE);
+        }
+            break;
+        default:
+            break;
+    }
+}
 
 AbstractWrapper* wrap(std::vector<AbstractWrapper*>* item) {auto wrapper = new Spawn_Wrapper; wrapper->item = item; return wrapper;}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -239,10 +260,17 @@ void Despawn_Interaction::apply(EnemyFilth_Wrapper *second)
         second->markedForDeletion = true;
     }
 }
+void Despawn_Interaction::apply(EnemyAndre_Wrapper *second)
+{
+    if(second->item->getHealth() <= 0) {
+        delete second->item;
+        second->markedForDeletion = true;
+    }
+}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Model::Model()
-    : spawnWrapper(wrap(&entities))
+    : spawnWrapper(wrap(&dynamicEntities))
     , despawnWrapper(new Despawn_Wrapper) {}
 
 void Model::update(qreal deltaT)
@@ -253,44 +281,68 @@ void Model::update(qreal deltaT)
     delete inputWrapper;
     // spawning entities
     interact(spawnWrapper, playerEntity);
-    for(auto* entity : entities)
+    for(auto* entity : staticEntities)
+        interact(spawnWrapper, entity);
+    for(auto* entity : dynamicEntities)
         interact(spawnWrapper, entity);
     // self update
-    for(auto* entity : entities)
+    for(auto* entity : staticEntities)
+        interact(entity, entity);
+    for(auto* entity : dynamicEntities)
         interact(entity, entity);
     // paired interactions
-    for(auto* entity1 : entities) {
-        for(auto* entity2 : entities) {
+    for(auto* staticEntity : staticEntities) {
+        for(auto* dynamicEntity : dynamicEntities)
+            interact(staticEntity, dynamicEntity);
+    }
+    for(auto* entity1 : dynamicEntities) {
+        for(auto* entity2 : dynamicEntities) {
             if(entity1 != entity2)
                 interact(entity1, entity2);
         }
     }
     // player interactions
-    for(auto* entity : entities) {
+    for(auto* entity : dynamicEntities) {
         interact(playerEntity, entity);
+        interact(entity, playerEntity);
+    }
+    for(auto* entity : staticEntities) {
         interact(entity, playerEntity);
     }
     // time update
     auto* timeWrapper = wrap(new qreal(deltaT));
-    for(auto* entity : entities) {
+    for(auto* entity : dynamicEntities) {
+        interact(timeWrapper, entity);
+    }
+    for(auto* entity : staticEntities) {
         interact(timeWrapper, entity);
     }
     interact(timeWrapper, playerEntity);
     delete timeWrapper;
     // despawning entities
-    for(auto* entity : entities)
+    for(auto* entity : dynamicEntities)
         interact(despawnWrapper, entity);
-    std::erase_if(entities, [](AbstractWrapper* w){return w->markedForDeletion;});
+    std::erase_if(dynamicEntities, [](AbstractWrapper* w){return w->markedForDeletion;});
 }
 
-std::vector<AbstractWrapper *> Model::getEntities() const
+void Model::addStaticEntity(AbstractWrapper *entity)
 {
-    return entities;
+    staticEntities.push_back(entity);
 }
 
-void Model::addEntity(AbstractWrapper *entity)
+void Model::addDynamicEntity(AbstractWrapper *entity)
 {
-    entities.push_back(entity);
+    dynamicEntities.push_back(entity);
+}
+
+std::vector<AbstractWrapper *> &Model::getStaticEntities()
+{
+    return staticEntities;
+}
+
+std::vector<AbstractWrapper *> &Model::getDynamicEntities()
+{
+    return dynamicEntities;
 }
 
 void Model::setInputMask(int _inputMask)

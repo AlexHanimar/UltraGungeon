@@ -8,6 +8,7 @@ struct {
     QImage* PlayerEntity_Sprite = new QImage("../../sprites/defaultSprite.png");
     QImage* Projectile_Sprite = new QImage("../../sprites/defaultSprite.png");
     QImage* EnemyFilth_Sprite = new QImage("../../sprites/defaultSprite.png");
+    QImage* EnemyAndre_Sprite = new QImage("../../sprites/defaultSprite.png");
 } Sprites;
 
 Renderer_Interaction::~Renderer_Interaction() noexcept {}
@@ -84,6 +85,17 @@ void Renderer_Interaction::apply(Projectile_Wrapper *second)
 void Renderer_Interaction::apply(EnemyFilth_Wrapper *second)
 {
     auto* img = Sprites.EnemyFilth_Sprite;
+    QSizeF size = second->item->getCollider()->getSize();
+    QImage img2 = img->scaled(size.width(), size.height());
+    QPoint dPos = QPoint(-img2.width() * 0.5, -img2.height() * 0.5);
+    auto* item = first->scene->addPixmap(QPixmap::fromImage(img2));
+    item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
+    item->setScale(first->scale);
+}
+
+void Renderer_Interaction::apply(EnemyAndre_Wrapper *second)
+{
+    auto* img = Sprites.EnemyAndre_Sprite;
     QSizeF size = second->item->getCollider()->getSize();
     QImage img2 = img->scaled(size.width(), size.height());
     QPoint dPos = QPoint(-img2.width() * 0.5, -img2.height() * 0.5);
