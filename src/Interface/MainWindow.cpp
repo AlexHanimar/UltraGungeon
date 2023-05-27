@@ -1,5 +1,6 @@
 #include <Interface/MainWindow.h>
 #include <QKeyEvent>
+#include <QGraphicsItem>
 
 void GraphicsView::wheelEvent(QWheelEvent *event) {event->ignore();}
 void GraphicsView::mousePressEvent(QMouseEvent *event) {event->ignore();}
@@ -47,9 +48,9 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
     player->init();
     model->setPlayerEntity(player);
 
-    auto* enemy = new EnemyAndre(0, {30, 30}, {1200, 1200});
-    enemy->init();
-    model->addDynamicEntity(wrap(enemy));
+    auto* andre = new EnemyAndre(0, {30, 30}, {1200, 1200});
+    andre->init();
+    model->addDynamicEntity(wrap(andre));
 
     auto* trigger = new Trigger({200, 200}, {1200, 1200});
     model->addTrigger(wrap(trigger));
@@ -57,6 +58,14 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
     auto* door = new Door({100, 100}, 2, 2, {1200, 800});
     door->setActive(false);
     model->addStaticEntity(wrap(door));
+
+    QPointF sPos = {1000, 1200};
+    for(int i = 0;i < 20;i++) {
+        auto* filth = new EnemyFilth(0, {10, 10}, sPos);
+        filth->init();
+        model->addDynamicEntity(wrap(filth));
+        sPos += {20, 0};
+    }
 }
 
 void MainWindow::paintEvent(QPaintEvent *)
@@ -71,6 +80,8 @@ void MainWindow::paintEvent(QPaintEvent *)
     for(auto* entity : model->getStaticEntities())
         interact(renderer, entity);
     for(auto* entity : model->getTriggers())
+        interact(renderer, entity);
+    for(auto* entity : model->getHitscans())
         interact(renderer, entity);
     interact(renderer, model->getPlayerEntity());
     delete renderer;
@@ -99,6 +110,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             break;
         case Qt::Key_D:
             inputMask |= INPUT::KEY_D;
+            break;
+        case Qt::Key_F:
+            inputMask |= INPUT::KEY_F;
             break;
         case Qt::Key_Shift:
             inputMask |= INPUT::KEY_DASH;
@@ -131,6 +145,9 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
             break;
         case Qt::Key_D:
             inputMask &= ~INPUT::KEY_D;
+            break;
+        case Qt::Key_F:
+            inputMask &= ~INPUT::KEY_F;
             break;
         case Qt::Key_Shift:
             inputMask &= ~INPUT::KEY_DASH;

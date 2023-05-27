@@ -3,6 +3,9 @@
 #include <Model/EntityWrapper.h>
 #include <vector>
 
+// forward declaration
+class Model;
+
 // Time interaction
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 struct Time_Wrapper;
@@ -25,6 +28,9 @@ struct Time_Interaction : public AbstractInteraction {
     void apply(EnemyAndre_Wrapper* second) override;
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
+    void apply(PistolHitscan_Wrapper* second) override;
+    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(AndreBallProjectile_Wrapper* second) override;
     ~Time_Interaction();
 };
 AbstractWrapper* wrap(qreal* timeItem);
@@ -53,6 +59,9 @@ struct Input_Interaction : public AbstractInteraction {
     void apply(EnemyAndre_Wrapper* second) override;
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
+    void apply(PistolHitscan_Wrapper* second) override;
+    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(AndreBallProjectile_Wrapper* second) override;
     virtual ~Input_Interaction() override;
 };
 AbstractWrapper* wrap(int* inputItem, QPointF* mouseItem);
@@ -64,7 +73,7 @@ struct Spawn_Wrapper;
 struct Spawn_Interaction;
 
 struct Spawn_Wrapper : public AbstractWrapper {
-    std::vector<AbstractWrapper*>* item;
+    Model* item;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
 };
@@ -80,7 +89,11 @@ struct Spawn_Interaction : public AbstractInteraction {
     void apply(EnemyAndre_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(Trigger_Wrapper* second) override;
+    void apply(PistolHitscan_Wrapper* second) override;
+    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(AndreBallProjectile_Wrapper* second) override;
 };
+AbstractWrapper* wrap(Model* item);
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // Despawn interaction
@@ -104,6 +117,9 @@ struct Despawn_Interaction : public AbstractInteraction {
     void apply(EnemyAndre_Wrapper* second) override;
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
+    void apply(PistolHitscan_Wrapper* second) override;
+    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(AndreBallProjectile_Wrapper* second) override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -113,6 +129,7 @@ enum INPUT {
     KEY_S =     0b000000000100,
     KEY_D =     0b000000001000,
     KEY_DASH =  0b000000010000,
+    KEY_F =     0b000001000000,
     MOUSE_1 =   0b100000000000,
     MOUSE_2 =   0b010000000000,
     KEY_1 =     0b001000000000,
@@ -124,6 +141,7 @@ class Model {
 protected:
     int inputMask;
     QPointF mouseDirection;
+    AbstractWrapper* inputWrapper;
     AbstractWrapper* playerEntity;
     AbstractWrapper* spawnWrapper;
     AbstractWrapper* despawnWrapper;
@@ -131,12 +149,14 @@ protected:
     std::vector<AbstractWrapper*> staticEntities;
     std::vector<AbstractWrapper*> dynamicEntities;
     std::vector<AbstractWrapper*> triggers;
+    std::vector<AbstractWrapper*> hitscans;
 public:
     Model();
     void update(qreal deltaT);
     std::vector<AbstractWrapper*>& getStaticEntities();
     std::vector<AbstractWrapper*>& getDynamicEntities();
     std::vector<AbstractWrapper*>& getTriggers();
+    std::vector<AbstractWrapper*>& getHitscans();
     [[nodiscard("Model::getPlayerEntity() unused")]] AbstractWrapper* getPlayerEntity() const;
 
     void setPlayerEntity(PlayerEntity* player);
@@ -144,6 +164,7 @@ public:
     void addStaticEntity(AbstractWrapper* entity);
     void addDynamicEntity(AbstractWrapper* entity);
     void addTrigger(AbstractWrapper* trigger);
+    void addHitscan(AbstractWrapper* hitscan);
 
     void setInputMask(int _inputMask);
     void setMouseDirection(QPointF _mouseDirection);

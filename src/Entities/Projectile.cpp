@@ -41,15 +41,6 @@ void Projectile::setState(int _state)
     }
 }
 
-Projectile* pistol1(QPointF pos, QPointF dir)
-{
-    auto* res = new Projectile(500, {6, 6}, pos);
-    res->setVelocity(normalize(dir) * 500.0);
-    res->setDamage(1);
-    res->setTeam(TEAM::PLAYER);
-    return res;
-}
-
 Projectile* pistol2(QPointF pos, QPointF dir)
 {
     auto* res = new Projectile(500, {6, 6}, pos);
@@ -80,15 +71,11 @@ std::vector<Projectile*> shotgun1(QPointF pos, QPointF dir)
 
 Projectile* shotgun2(QPointF pos, QPointF dir)
 {
-    return pistol1(pos, dir);
-}
-Projectile* railgun1(QPointF pos, QPointF dir)
-{
-    return pistol1(pos, dir);
+    return pellet(pos, dir);
 }
 Projectile* railgun2(QPointF pos, QPointF dir)
 {
-    return pistol1(pos, dir);
+    return pellet(pos, dir);
 }
 
 Projectile* andreBall(QPointF pos, QPointF dir)

@@ -47,8 +47,8 @@ void EnemyFilth::update(qreal deltaT)
                 setDirection(destination - getAbsolutePosition());
             }
             else {
-                setDirection(destination - getAbsolutePosition());
-                setSpeed(defaultSpeed);
+                QPointF dir = normalize(destination - getAbsolutePosition());
+                setVelocity(getVelocity() + dir * maxSpeed);
             }
             break;
         case EnemyFilth::STATE::DASHING:

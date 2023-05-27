@@ -10,6 +10,9 @@ set(HEADER_LIST
         ../../include/Entities/EnemyAndre.h
         ../../include/Entities/Trigger.h
         ../../include/Entities/Hitscan.h
+        ../../include/Entities/PistolHitscan.h
+        ../../include/Entities/BlueRailcannonHitscan.h
+        ../../include/Entities/AndreBallProjectile.h
         )
 
 set(SOURCE_LIST
@@ -23,6 +26,9 @@ set(SOURCE_LIST
         EnemyAndre.cpp
         Trigger.cpp
         Hitscan.cpp
+        PistolHitscan.cpp
+        BlueRailcannonHitscan.cpp
+        AndreBallProjectile.cpp
         )
 
 add_library(Entities ${SOURCE_LIST} ${HEADER_LIST})

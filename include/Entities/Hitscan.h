@@ -2,6 +2,7 @@
 
 #include <BasicObjects/AbstractHitbox.h>
 #include <Helpers/Helpers.h>
+#include <Entities/Teams.h>
 
 class Hitscan : public GameObject {
 protected:
@@ -15,14 +16,19 @@ protected:
     qreal lifeTime;
     qreal maxLifeTime;
     int state;
+
+    TEAM team;
+
+    QPointF endpoint;
 public:
     enum STATE {
-        DEFAULT = 0,
-        FULL = 1,
-        DESTROYED = 2
+        CHARGED = 0,
+        DEFAULT = 1,
+        DISCHARGED = 2,
+        DESTROYED = 3
     };
 
-    using GameObject::GameObject;
+    Hitscan(qreal _damage, int _pierce, QPointF _pos, QPointF _dir, qreal _lifetime, TEAM _team);
 
     [[nodiscard("Hitscan::getState() unused")]] virtual int getState() const;
     virtual void setState(int _state);
@@ -31,9 +37,7 @@ public:
     [[nodiscard("Hitscan::getStartPoint() unused")]] virtual QPointF getStartPoint() const;
     [[nodiscard("Hitscan::getEndpoint() unused")]] virtual QPointF getEndpoint() const;
     [[nodiscard("Hitscan::getDamage() unused")]] virtual qreal getDamage() const;
+    [[nodiscard("Hitscan::pierces() unused")]] virtual bool pierces(AbstractHitbox* hitbox) const;
 
-    void init(QPointF _pos, QPointF _dir, int _pierce, qreal _damage, qreal _maxLifeTime);
     void update(qreal deltaT);
 };
-
-Hitscan* _pistol1(QPointF pos, QPointF dir);

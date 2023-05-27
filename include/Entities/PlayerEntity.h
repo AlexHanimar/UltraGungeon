@@ -21,10 +21,16 @@ private:
     std::vector<qreal> reloadTimer; //
     std::vector<qreal> maxReloadTimer; //
 
-
-
     int spawnAction;
     QPointF spawnDirection;
+
+    AbstractHitbox* parryHitbox; //
+    qreal parryHitboxDist; //
+    int parryState; //
+    qreal parryTimer; //
+    qreal maxParryTimer; //
+    qreal parryRecoveryTimer; //
+    qreal maxParryRecoveryTimer; //
 public:
     enum STATE {
         DEFAULT = 0,
@@ -47,7 +53,13 @@ public:
         SHOTGUN_1 = 2,
         SHOTGUN_2 = 3,
         RAILGUN_1 = 4,
-        RAILGUN_2 = 5
+        RAILGUN_2 = 5,
+        PARRY = 6
+    };
+    enum PARRY_STATE {
+        PARRY_DEFAULT = 0,
+        PARRY_ACTIVE = 1,
+        PARRY_RECOVERY = 2
     };
     using MovableEntity::MovableEntity;
     void setState(int _state);
@@ -59,9 +71,12 @@ public:
 
     void setWeapon(int _weapon);
     [[nodiscard("PlayerEntity::getWeapon() unused")]] int getWeapon() const;
-
     void setWeaponState(int _state);
     [[nodiscard("PlayerEntity::getWeaponState() unused")]] int getWeaponState() const;
+
+    void setParryState(int _state);
+    [[nodiscard("PlayerEntity::getParryState() unused")]] int getParryState() const;
+    [[nodiscard("PlayerEntity::getParryHitbox() unused")]] AbstractHitbox* getParryHitbox() const;
 
     void setSpawnAction(int _spawnAction);
     [[nodiscard("PlayerEntity::getSpawnAction() unused")]] int getSpawnAction() const;

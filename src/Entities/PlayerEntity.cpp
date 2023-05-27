@@ -1,5 +1,6 @@
 #include <Entities/PlayerEntity.h>
 #include <QDebug>
+#include <Helpers/Helpers.h>
 
 int PlayerEntity::getState() const
 {
@@ -79,6 +80,9 @@ void PlayerEntity::setSpawnAction(int _spawnAction)
         case PlayerEntity::SPAWN_ACTION::RAILGUN_2:
             spawnAction = PlayerEntity::SPAWN_ACTION::RAILGUN_2;
             break;
+        case PlayerEntity::SPAWN_ACTION::PARRY:
+            spawnAction = PlayerEntity::SPAWN_ACTION::PARRY;
+            break;
         case PlayerEntity::SPAWN_ACTION::NONE:
             spawnAction = PlayerEntity::SPAWN_ACTION::NONE;
             break;
@@ -112,6 +116,35 @@ void PlayerEntity::setState(int _state)
     }
 }
 
+int PlayerEntity::getParryState() const
+{
+    return parryState;
+}
+
+void PlayerEntity::setParryState(int _state)
+{
+    switch(_state) {
+        case PlayerEntity::PARRY_STATE::PARRY_DEFAULT:
+            parryState = _state;
+            break;
+        case PlayerEntity::PARRY_STATE::PARRY_ACTIVE:
+            if(parryState != PlayerEntity::PARRY_STATE::PARRY_DEFAULT)
+                break;
+            parryState = _state;
+            parryTimer = maxParryTimer;
+            parryHitbox->setPosition(normalize(spawnDirection) * parryHitboxDist);
+            break;
+        case PlayerEntity::PARRY_STATE::PARRY_RECOVERY:
+            if(parryState != PlayerEntity::PARRY_STATE::PARRY_ACTIVE)
+                break;
+            parryState = _state;
+            parryRecoveryTimer = maxParryRecoveryTimer;
+            break;
+        default:
+            break;
+    }
+}
+
 void PlayerEntity::update(qreal deltaT)
 {
     moveBy(direction * speed * deltaT);
@@ -125,6 +158,19 @@ void PlayerEntity::update(qreal deltaT)
         if(dashRechargeTimer < 0)
             setState(PlayerEntity::STATE::DEFAULT);
     }
+
+    parryHitbox->setPosition(normalize(spawnDirection) * parryHitboxDist);
+    if(parryState == PlayerEntity::PARRY_STATE::PARRY_ACTIVE) {
+        parryTimer -= deltaT;
+        if(parryTimer < 0)
+            setParryState(PlayerEntity::PARRY_STATE::PARRY_RECOVERY);
+    }
+    else if(parryState == PlayerEntity::PARRY_STATE::PARRY_RECOVERY) {
+        parryRecoveryTimer -= deltaT;
+        if(parryRecoveryTimer < 0)
+            setParryState(PlayerEntity::PARRY_STATE::PARRY_DEFAULT);
+    }
+
     for(int i = 0;i < reloadTimer.size();i++) {
         if(weaponState[i] == PlayerEntity::WEAPON_STATE::READY)
             continue;
@@ -149,6 +195,11 @@ qreal PlayerEntity::getMaxHealth() const
     return maxHealth;
 }
 
+AbstractHitbox *PlayerEntity::getParryHitbox() const
+{
+    return parryHitbox;
+}
+
 void PlayerEntity::init()
 {
     defaultSpeed = 100.0;
@@ -161,6 +212,13 @@ void PlayerEntity::init()
     reloadTimer = {0.0, 0.0, 0.0};
     weaponState = {PlayerEntity::WEAPON_STATE::READY, PlayerEntity::WEAPON_STATE::READY, PlayerEntity::WEAPON_STATE::READY};
     weapon = PlayerEntity::WEAPON::PISTOL;
+
+    parryHitboxDist = 10.0;
+    parryHitbox = new AbstractHitbox({20, 20}, {0, 0}, this);
+    maxParryTimer = 0.1;
+    maxParryRecoveryTimer = 1.0;
+
     setState(PlayerEntity::STATE::DEFAULT);
     setSpawnAction(PlayerEntity::SPAWN_ACTION::NONE);
+    setParryState(PlayerEntity::PARRY_STATE::PARRY_DEFAULT);
 }
