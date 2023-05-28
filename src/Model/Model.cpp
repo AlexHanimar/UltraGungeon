@@ -26,7 +26,8 @@ void Time_Interaction::apply(PlayerEntity_Wrapper *second)
 }
 void Time_Interaction::apply(Projectile_Wrapper *second)
 {
-    second->item->update(*first->item);
+    if(second->item->getState() != Projectile::STATE::DESTROYED)
+        second->item->update(*first->item);
 }
 void Time_Interaction::apply(EnemyFilth_Wrapper *second)
 {
@@ -45,21 +46,36 @@ void Time_Interaction::apply(PistolHitscan_Wrapper *second)
 {
     second->item->update(*first->item);
 }
-void Time_Interaction::apply(BlueRailcannonHitscan_Wrapper *second)
+void Time_Interaction::apply(BlueRailgunHitscan_Wrapper *second)
 {
     second->item->update(*first->item);
 }
 void Time_Interaction::apply(AndreBallProjectile_Wrapper *second)
 {
-    second->item->update(*first->item);
+    if(second->item->getState() != AndreBallProjectile::STATE::DESTROYED)
+        second->item->update(*first->item);
 }
 void Time_Interaction::apply(ParryProjectile_Wrapper *second)
+{
+    if(second->item->getState() != ParryProjectile::STATE::DESTROYED)
+        second->item->update(*first->item);
+}
+void Time_Interaction::apply(ShotgunPelletProjectile_Wrapper *second)
+{
+    if(second->item->getState() != ShotgunPelletProjectile::STATE::DESTROYED)
+        second->item->update(*first->item);
+}
+void Time_Interaction::apply(Explosion_Wrapper *second)
+{
+    second->item->update(*first->item);
+}
+void Time_Interaction::apply(Coin_Wrapper *second)
 {
     second->item->update(*first->item);
 }
 
 Time_Wrapper::~Time_Wrapper() {delete item;}
-Time_Interaction::~Time_Interaction() {}
+Time_Interaction::~Time_Interaction() = default;
 
 AbstractWrapper* wrap(qreal *timeItem) {auto wrapper = new Time_Wrapper; wrapper->item = timeItem; return wrapper;}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -153,9 +169,12 @@ void Input_Interaction::apply(EnemyAndre_Wrapper *second) {}
 void Input_Interaction::apply(Trigger_Wrapper *second) {}
 void Input_Interaction::apply(Hitscan_Wrapper *second) {}
 void Input_Interaction::apply(PistolHitscan_Wrapper *second) {}
-void Input_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
+void Input_Interaction::apply(BlueRailgunHitscan_Wrapper *second) {}
 void Input_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
 void Input_Interaction::apply(ParryProjectile_Wrapper *second) {}
+void Input_Interaction::apply(ShotgunPelletProjectile_Wrapper *second) {}
+void Input_Interaction::apply(Explosion_Wrapper *second) {}
+void Input_Interaction::apply(Coin_Wrapper *second) {}
 
 Input_Wrapper::~Input_Wrapper()
 {
@@ -164,10 +183,7 @@ Input_Wrapper::~Input_Wrapper()
     mouseDir = nullptr;
     delete mouseDir;
 }
-Input_Interaction::~Input_Interaction()
-{
-    //delete first;
-}
+Input_Interaction::~Input_Interaction() = default;
 
 AbstractWrapper* wrap(int *inputItem, QPointF* mouseItem)
 {
@@ -201,23 +217,22 @@ void Spawn_Interaction::apply(PlayerEntity_Wrapper *second)
         {
             second->item->setWeaponState(PlayerEntity::WEAPON_STATE::RELOADING);
             auto* hitscan = new PistolHitscan(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
-            //auto* projectile = pistol1(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
             first->item->addHitscan(wrap(hitscan));
         }
             break;
         case PlayerEntity::SPAWN_ACTION::PISTOL_2:
         {
             second->item->setWeaponState(PlayerEntity::WEAPON_STATE::RELOADING);
-            auto* projectile = pistol2(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
-            first->item->addDynamicEntity(wrap(projectile));
+            auto* coin = new Coin(second->item->getAbsolutePosition(), second->item->getSpawnDirection(), second->item->getVelocity());
+            first->item->addCoin(wrap(coin));
         }
             break;
         case PlayerEntity::SPAWN_ACTION::SHOTGUN_1:
         {
             second->item->setWeaponState(PlayerEntity::WEAPON_STATE::RELOADING);
-            auto projectiles = shotgun1(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
-            for(auto* projectile : projectiles)
-                first->item->addDynamicEntity(wrap(projectile));
+            for(int i = 0;i < 10;i++)
+                first->item->addDynamicEntity(wrap(new ShotgunPelletProjectile(second->item->getAbsolutePosition()
+                                                                               , second->item->getSpawnDirection())));
         }
             break;
         case PlayerEntity::SPAWN_ACTION::SHOTGUN_2:
@@ -230,7 +245,7 @@ void Spawn_Interaction::apply(PlayerEntity_Wrapper *second)
         case PlayerEntity::SPAWN_ACTION::RAILGUN_1:
         {
             second->item->setWeaponState(PlayerEntity::WEAPON_STATE::RELOADING);
-            auto* hitscan = new BlueRailcannonHitscan(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
+            auto* hitscan = new BlueRailgunHitscan(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
             first->item->addHitscan(wrap(hitscan));
         }
             break;
@@ -284,21 +299,53 @@ void Spawn_Interaction::apply(Trigger_Wrapper *second)
 }
 void Spawn_Interaction::apply(Hitscan_Wrapper *second) {}
 void Spawn_Interaction::apply(PistolHitscan_Wrapper *second) {}
-void Spawn_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
-void Spawn_Interaction::apply(AndreBallProjectile_Wrapper *second)
+void Spawn_Interaction::apply(BlueRailgunHitscan_Wrapper *second) {}
+void Spawn_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void Spawn_Interaction::apply(ParryProjectile_Wrapper *second) {}
+void Spawn_Interaction::apply(ShotgunPelletProjectile_Wrapper *second) {}
+void Spawn_Interaction::apply(Explosion_Wrapper *second) {}
+void Spawn_Interaction::apply(Coin_Wrapper *second)
 {
-    if(second->item->getState() == AndreBallProjectile::STATE::DESTROYED) {
-        // spawn explosion
+    if(second->item->getState() != Coin::STATE::DEADCOIN)
+        return;
+    switch(second->item->getSpawnAction()) {
+        case Coin::SPAWN_ACTION::PISTOL:
+            if(second->item->getTargets().empty()) {
+                QPointF dir1 = second->item->getVelocity();
+                QPointF dir2 = -dir1;
+                first->item->addHitscan(wrap(new PistolHitscan(second->item->getAbsolutePosition(), dir1)));
+                first->item->addHitscan(wrap(new PistolHitscan(second->item->getAbsolutePosition(), dir2)));
+            }
+            else if(second->item->getTargets().size() == 1) {
+                QPointF dir1 = (second->item->getTargets()[0] - second->item->getAbsolutePosition());
+                QPointF dir2 = -dir1;
+                first->item->addHitscan(wrap(new PistolHitscan(second->item->getAbsolutePosition(), dir1)));
+                first->item->addHitscan(wrap(new PistolHitscan(second->item->getAbsolutePosition(), dir2)));
+            }
+            else {
+                QPointF dir1 = (second->item->getTargets()[0] - second->item->getAbsolutePosition());
+                QPointF dir2 = (second->item->getTargets()[1] - second->item->getAbsolutePosition());
+                first->item->addHitscan(wrap(new PistolHitscan(second->item->getAbsolutePosition(), dir1)));
+                first->item->addHitscan(wrap(new PistolHitscan(second->item->getAbsolutePosition(), dir2)));
+            }
+            break;
+        case Coin::SPAWN_ACTION::RAILGUN:
+            if(second->item->getTargets().empty()) {
+                QPointF dir = second->item->getVelocity();
+                first->item->addHitscan(wrap(new BlueRailgunHitscan(second->item->getAbsolutePosition(), dir)));
+            }
+            else {
+                QPointF dir = (second->item->getTargets()[0] - second->item->getAbsolutePosition());
+                first->item->addHitscan(wrap(new BlueRailgunHitscan(second->item->getAbsolutePosition(), dir)));
+            }
+            break;
+        default:
+            break;
     }
-}
-void Spawn_Interaction::apply(ParryProjectile_Wrapper *second)
-{
-    if(second->item->getState() == ParryProjectile::STATE::DESTROYED) {
-        // spawn explosion
-    }
+    second->item->setState(Coin::STATE::DESTROYED);
 }
 
-AbstractWrapper* wrap(Model* item) {auto wrapper = new Spawn_Wrapper; wrapper->item = item; return wrapper;}
+Spawn_Wrapper::Spawn_Wrapper(Model *_model) : item(_model) {}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // Despawn interaction
@@ -352,7 +399,7 @@ void Despawn_Interaction::apply(PistolHitscan_Wrapper *second)
         second->markedForDeletion = true;
     }
 }
-void Despawn_Interaction::apply(BlueRailcannonHitscan_Wrapper *second)
+void Despawn_Interaction::apply(BlueRailgunHitscan_Wrapper *second)
 {
     if(second->item->getState() == Hitscan::STATE::DESTROYED) {
         delete second->item;
@@ -362,17 +409,44 @@ void Despawn_Interaction::apply(BlueRailcannonHitscan_Wrapper *second)
 void Despawn_Interaction::apply(AndreBallProjectile_Wrapper *second)
 {
     if(second->item->getState() == AndreBallProjectile::STATE::DESTROYED) {
+        QPointF pos = second->item->getAbsolutePosition();
+        first->item->addExplosion(wrap(new Explosion(pos, 20, 3)));
         delete second->item;
         second->markedForDeletion = true;
     }
 }
 void Despawn_Interaction::apply(ParryProjectile_Wrapper *second)
 {
-    if(second->item->getState() == AndreBallProjectile::STATE::DESTROYED) {
+    if(second->item->getState() == ParryProjectile::STATE::DESTROYED) {
+        QPointF pos = second->item->getAbsolutePosition();
+        first->item->addExplosion(wrap(new Explosion(pos, 20, 3)));
         delete second->item;
         second->markedForDeletion = true;
     }
 }
+void Despawn_Interaction::apply(ShotgunPelletProjectile_Wrapper *second)
+{
+    if(second->item->getState() == ShotgunPelletProjectile::STATE::DESTROYED) {
+        delete second->item;
+        second->markedForDeletion = true;
+    }
+}
+void Despawn_Interaction::apply(Explosion_Wrapper *second)
+{
+    if(second->item->getState() == Explosion::STATE::DESTROYED) {
+        delete second->item;
+        second->markedForDeletion = true;
+    }
+}
+void Despawn_Interaction::apply(Coin_Wrapper *second)
+{
+    if(second->item->getState() == Coin::STATE::DESTROYED) {
+        delete second->item;
+        second->markedForDeletion = true;
+    }
+}
+
+Despawn_Wrapper::Despawn_Wrapper(Model *_model) : item(_model) {}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // Trigger manager
@@ -415,9 +489,12 @@ void TriggerManager_Interaction::apply(Trigger_Wrapper *second)
 }
 void TriggerManager_Interaction::apply(Hitscan_Wrapper *second) {}
 void TriggerManager_Interaction::apply(PistolHitscan_Wrapper *second) {}
-void TriggerManager_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
+void TriggerManager_Interaction::apply(BlueRailgunHitscan_Wrapper *second) {}
 void TriggerManager_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
 void TriggerManager_Interaction::apply(ParryProjectile_Wrapper *second) {}
+void TriggerManager_Interaction::apply(ShotgunPelletProjectile_Wrapper *second) {}
+void TriggerManager_Interaction::apply(Explosion_Wrapper *second) {}
+void TriggerManager_Interaction::apply(Coin_Wrapper *second) {}
 
 TriggerManager_Wrapper::~TriggerManager_Wrapper()
 {
@@ -428,8 +505,8 @@ TriggerManager_Interaction::~TriggerManager_Interaction() = default;
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Model::Model()
-    : spawnWrapper(wrap(this))
-    , despawnWrapper(new Despawn_Wrapper)
+    : spawnWrapper(new Spawn_Wrapper(this))
+    , despawnWrapper(new Despawn_Wrapper(this))
     , inputWrapper(wrap(&inputMask, &mouseDirection)) {}
 
 void Model::update(qreal deltaT)
@@ -455,6 +532,8 @@ void Model::update(qreal deltaT)
         interact(spawnWrapper, entity);
     for(auto* trigger : triggers)
         interact(spawnWrapper, trigger);
+    for(auto* coin : coins)
+        interact(spawnWrapper, coin);
 
     // paired interactions
     for(auto* staticEntity : staticEntities) {
@@ -475,6 +554,24 @@ void Model::update(qreal deltaT)
         for(auto* entity : staticEntities)
             interact(hitscan, entity);
     }
+    for(auto* explosion : explosions) {
+        for(auto* entity : dynamicEntities)
+            interact(explosion, entity);
+    }
+    for(auto* hitscan : hitscans) {
+        for(auto* coin : coins)
+            interact(hitscan, coin);
+    }
+    for(auto* coin : coins) {
+        for(auto* entity : dynamicEntities)
+            interact(coin, entity);
+    }
+    for(auto* coin1 : coins) {
+        for(auto* coin2 : coins) {
+            if(coin1 != coin2)
+                interact(coin1, coin2);
+        }
+    }
 
     // player interactions
     for(auto* entity : dynamicEntities) {
@@ -484,12 +581,19 @@ void Model::update(qreal deltaT)
     for(auto* entity : staticEntities) {
         interact(entity, playerEntity);
     }
+    for(auto* explosion : explosions) {
+        interact(explosion, playerEntity);
+    }
 
     // self update
     for(auto* hitscan : hitscans)
         interact(hitscan, hitscan);
     for(auto* trigger : triggers)
         interact(trigger, trigger);
+    for(auto* explosion : explosions)
+        interact(explosion, explosion);
+    for(auto* coin : coins)
+        interact(coin, coin);
 
     // triggers
     for(auto* entity : dynamicEntities)
@@ -510,6 +614,11 @@ void Model::update(qreal deltaT)
     for(auto* hitscan : hitscans) {
         interact(timeWrapper, hitscan);
     }
+    for(auto* explosion : explosions) {
+        interact(timeWrapper, explosion);
+    }
+    for(auto* coin : coins)
+        interact(timeWrapper, coin);
     interact(timeWrapper, playerEntity);
     delete timeWrapper;
 
@@ -518,8 +627,14 @@ void Model::update(qreal deltaT)
         interact(despawnWrapper, entity);
     for(auto* entity : hitscans)
         interact(despawnWrapper, entity);
+    for(auto* entity : explosions)
+        interact(despawnWrapper, entity);
+    for(auto* entity : coins)
+        interact(despawnWrapper, entity);
     std::erase_if(dynamicEntities, [](AbstractWrapper* w){return w->markedForDeletion;});
     std::erase_if(hitscans, [](AbstractWrapper* w){return w->markedForDeletion;});
+    std::erase_if(explosions, [](AbstractWrapper* w){return w->markedForDeletion;});
+    std::erase_if(coins, [](AbstractWrapper* w){return w->markedForDeletion;});
 }
 
 void Model::addStaticEntity(AbstractWrapper *entity)
@@ -542,6 +657,16 @@ void Model::addHitscan(AbstractWrapper *hitscan)
     hitscans.push_back(hitscan);
 }
 
+void Model::addExplosion(AbstractWrapper *explosion)
+{
+    explosions.push_back(explosion);
+}
+
+void Model::addCoin(AbstractWrapper *coin)
+{
+    coins.push_back(coin);
+}
+
 std::vector<AbstractWrapper *> &Model::getStaticEntities()
 {
     return staticEntities;
@@ -560,6 +685,16 @@ std::vector<AbstractWrapper *> &Model::getTriggers()
 std::vector<AbstractWrapper *> &Model::getHitscans()
 {
     return hitscans;
+}
+
+std::vector<AbstractWrapper *> &Model::getExplosions()
+{
+    return explosions;
+}
+
+std::vector<AbstractWrapper *> &Model::getCoins()
+{
+    return coins;
 }
 
 void Model::setInputMask(int _inputMask)

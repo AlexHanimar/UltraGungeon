@@ -10,9 +10,12 @@
 #include <Entities/Trigger.h>
 #include <Entities/Hitscan.h>
 #include <Entities/PistolHitscan.h>
-#include <Entities/BlueRailcannonHitscan.h>
+#include <Entities/BlueRailgunHitscan.h>
 #include <Entities/AndreBallProjectile.h>
 #include <Entities/ParryProjectile.h>
+#include <Entities/ShotgunPelletProjectile.h>
+#include <Entities/Explosion.h>
+#include <Entities/Coin.h>
 
 struct AbstractWrapper;
 
@@ -26,9 +29,12 @@ struct EnemyAndre_Wrapper;
 struct Trigger_Wrapper;
 struct Hitscan_Wrapper;
 struct PistolHitscan_Wrapper;
-struct BlueRailcannonHitscan_Wrapper;
+struct BlueRailgunHitscan_Wrapper;
 struct AndreBallProjectile_Wrapper;
 struct ParryProjectile_Wrapper;
+struct ShotgunPelletProjectile_Wrapper;
+struct Explosion_Wrapper;
+struct Coin_Wrapper;
 
 
 
@@ -42,9 +48,12 @@ struct EnemyAndre_Interaction;
 struct Trigger_Interaction;
 struct Hitscan_interaction;
 struct PistolHitscan_Interaction;
-struct BlueRailcannonHitscan_Interaction;
+struct BlueRailgunHitscan_Interaction;
 struct AndreBallProjectile_Interaction;
 struct ParryProjectile_Interaction;
+struct ShotgunPelletProjectile_Interaction;
+struct Explosion_Interaction;
+struct Coin_Interaction;
 
 
 // abstract
@@ -60,9 +69,12 @@ struct AbstractInteraction {
     virtual void apply(Trigger_Wrapper *)  = 0;
     virtual void apply(Hitscan_Wrapper *) = 0;
     virtual void apply(PistolHitscan_Wrapper *) = 0;
-    virtual void apply(BlueRailcannonHitscan_Wrapper *) = 0;
+    virtual void apply(BlueRailgunHitscan_Wrapper *) = 0;
     virtual void apply(AndreBallProjectile_Wrapper *) = 0;
     virtual void apply(ParryProjectile_Wrapper *) = 0;
+    virtual void apply(ShotgunPelletProjectile_Wrapper *) = 0;
+    virtual void apply(Explosion_Wrapper *) = 0;
+    virtual void apply(Coin_Wrapper *) = 0;
 
     virtual ~AbstractInteraction();
 };
@@ -138,11 +150,11 @@ struct PistolHitscan_Wrapper : public AbstractWrapper {
     void accept(AbstractInteraction* interaction) override;
     ~PistolHitscan_Wrapper() override = default;
 };
-struct BlueRailcannonHitscan_Wrapper : public AbstractWrapper {
-    BlueRailcannonHitscan* item;
+struct BlueRailgunHitscan_Wrapper : public AbstractWrapper {
+    BlueRailgunHitscan* item;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
-    ~BlueRailcannonHitscan_Wrapper() override = default;
+    ~BlueRailgunHitscan_Wrapper() override = default;
 };
 struct AndreBallProjectile_Wrapper : public AbstractWrapper {
     AndreBallProjectile* item;
@@ -155,6 +167,24 @@ struct ParryProjectile_Wrapper : public AbstractWrapper {
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
     ~ParryProjectile_Wrapper() override = default;
+};
+struct ShotgunPelletProjectile_Wrapper : public AbstractWrapper {
+    ShotgunPelletProjectile* item;
+    AbstractInteraction* generateInteraction() override;
+    void accept(AbstractInteraction* interaction) override;
+    ~ShotgunPelletProjectile_Wrapper() override = default;
+};
+struct Explosion_Wrapper : public AbstractWrapper {
+    Explosion* item;
+    AbstractInteraction* generateInteraction() override;
+    void accept(AbstractInteraction* interaction) override;
+    ~Explosion_Wrapper() override = default;
+};
+struct Coin_Wrapper : public AbstractWrapper {
+    Coin* item;
+    AbstractInteraction* generateInteraction() override;
+    void accept(AbstractInteraction* interaction) override;
+    ~Coin_Wrapper() override = default;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -172,9 +202,12 @@ struct Wall_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~Wall_Interaction() override;
 };
 struct Door_Interaction : public AbstractInteraction {
@@ -189,9 +222,12 @@ struct Door_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~Door_Interaction() override;
 };
 struct MovableEntity_Interaction : public AbstractInteraction {
@@ -206,9 +242,12 @@ struct MovableEntity_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~MovableEntity_Interaction() override;
 };
 struct PlayerEntity_Interaction : public AbstractInteraction {
@@ -223,9 +262,12 @@ struct PlayerEntity_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~PlayerEntity_Interaction() override;
 };
 struct Projectile_Interaction : public AbstractInteraction {
@@ -240,9 +282,12 @@ struct Projectile_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~Projectile_Interaction() override;
 };
 struct EnemyFilth_Interaction : public AbstractInteraction {
@@ -257,9 +302,12 @@ struct EnemyFilth_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~EnemyFilth_Interaction() override;
 };
 struct EnemyAndre_Interaction : public AbstractInteraction {
@@ -274,9 +322,12 @@ struct EnemyAndre_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~EnemyAndre_Interaction() override;
 };
 struct Trigger_Interaction : public AbstractInteraction {
@@ -291,9 +342,12 @@ struct Trigger_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~Trigger_Interaction() override;
 };
 struct Hitscan_Interaction : public AbstractInteraction {
@@ -308,9 +362,12 @@ struct Hitscan_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~Hitscan_Interaction() override;
 };
 struct PistolHitscan_Interaction : public AbstractInteraction {
@@ -325,13 +382,16 @@ struct PistolHitscan_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~PistolHitscan_Interaction() override;
 };
-struct BlueRailcannonHitscan_Interaction : public AbstractInteraction {
-    BlueRailcannonHitscan_Wrapper* first;
+struct BlueRailgunHitscan_Interaction : public AbstractInteraction {
+    BlueRailgunHitscan_Wrapper* first;
     void apply(Wall_Wrapper* second) override;
     void apply(Door_Wrapper* second) override;
     void apply(MovableEntity_Wrapper* second) override;
@@ -342,10 +402,13 @@ struct BlueRailcannonHitscan_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
-    ~BlueRailcannonHitscan_Interaction() override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
+    ~BlueRailgunHitscan_Interaction() override;
 };
 struct AndreBallProjectile_Interaction : public AbstractInteraction {
     AndreBallProjectile_Wrapper* first;
@@ -359,9 +422,12 @@ struct AndreBallProjectile_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~AndreBallProjectile_Interaction() override;
 };
 struct ParryProjectile_Interaction : public AbstractInteraction {
@@ -376,10 +442,73 @@ struct ParryProjectile_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     ~ParryProjectile_Interaction() override;
+};
+struct ShotgunPelletProjectile_Interaction : public AbstractInteraction {
+    ShotgunPelletProjectile_Wrapper* first;
+    void apply(Wall_Wrapper* second) override;
+    void apply(Door_Wrapper* second) override;
+    void apply(MovableEntity_Wrapper* second) override;
+    void apply(PlayerEntity_Wrapper* second) override;
+    void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
+    void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
+    void apply(PistolHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
+    void apply(AndreBallProjectile_Wrapper* second) override;
+    void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
+    ~ShotgunPelletProjectile_Interaction() override;
+};
+struct Explosion_Interaction : public AbstractInteraction {
+    Explosion_Wrapper* first;
+    void apply(Wall_Wrapper* second) override;
+    void apply(Door_Wrapper* second) override;
+    void apply(MovableEntity_Wrapper* second) override;
+    void apply(PlayerEntity_Wrapper* second) override;
+    void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
+    void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
+    void apply(PistolHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
+    void apply(AndreBallProjectile_Wrapper* second) override;
+    void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
+    ~Explosion_Interaction() override;
+};
+struct Coin_Interaction : public AbstractInteraction {
+    Coin_Wrapper* first;
+    void apply(Wall_Wrapper* second) override;
+    void apply(Door_Wrapper* second) override;
+    void apply(MovableEntity_Wrapper* second) override;
+    void apply(PlayerEntity_Wrapper* second) override;
+    void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
+    void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
+    void apply(PistolHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
+    void apply(AndreBallProjectile_Wrapper* second) override;
+    void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
+    ~Coin_Interaction() override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -402,7 +531,10 @@ AbstractWrapper* wrap(EnemyAndre* item);
 AbstractWrapper* wrap(Trigger* item);
 AbstractWrapper* wrap(Hitscan* item);
 AbstractWrapper* wrap(PistolHitscan* item);
-AbstractWrapper* wrap(BlueRailcannonHitscan* item);
+AbstractWrapper* wrap(BlueRailgunHitscan* item);
 AbstractWrapper* wrap(AndreBallProjectile* item);
 AbstractWrapper* wrap(ParryProjectile* item);
+AbstractWrapper* wrap(ShotgunPelletProjectile* item);
+AbstractWrapper* wrap(Explosion* item);
+AbstractWrapper* wrap(Coin* item);
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

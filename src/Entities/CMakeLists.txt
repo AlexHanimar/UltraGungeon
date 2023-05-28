@@ -11,10 +11,12 @@ set(HEADER_LIST
         ../../include/Entities/Trigger.h
         ../../include/Entities/Hitscan.h
         ../../include/Entities/PistolHitscan.h
-        ../../include/Entities/BlueRailcannonHitscan.h
+        ../../include/Entities/BlueRailgunHitscan.h
         ../../include/Entities/AndreBallProjectile.h
         ../../include/Entities/ParryProjectile.h
         ../../include/Entities/ShotgunPelletProjectile.h
+        ../../include/Entities/Explosion.h
+        ../../include/Entities/Coin.h
         )
 
 set(SOURCE_LIST
@@ -29,10 +31,12 @@ set(SOURCE_LIST
         Trigger.cpp
         Hitscan.cpp
         PistolHitscan.cpp
-        BlueRailcannonHitscan.cpp
+        BlueRailgunHitscan.cpp
         AndreBallProjectile.cpp
         ParryProjectile.cpp
         ShotgunPelletProjectile.cpp
+        Explosion.cpp
+        Coin.cpp
         )
 
 add_library(Entities ${SOURCE_LIST} ${HEADER_LIST})

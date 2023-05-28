@@ -27,8 +27,11 @@ struct Renderer_Interaction : public AbstractInteraction {
     void apply(Trigger_Wrapper* second) override;
     void apply(Hitscan_Wrapper* second) override;
     void apply(PistolHitscan_Wrapper* second) override;
-    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(BlueRailgunHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
     void apply(ParryProjectile_Wrapper* second) override;
+    void apply(ShotgunPelletProjectile_Wrapper* second) override;
+    void apply(Explosion_Wrapper* second) override;
+    void apply(Coin_Wrapper* second) override;
     virtual ~Renderer_Interaction() override;
 };

@@ -158,7 +158,7 @@ void Renderer_Interaction::apply(PistolHitscan_Wrapper *second)
     item->setScale(first->scale);
 }
 
-void Renderer_Interaction::apply(BlueRailcannonHitscan_Wrapper *second)
+void Renderer_Interaction::apply(BlueRailgunHitscan_Wrapper *second)
 {
     if(second->item->getState() == Hitscan::STATE::CHARGED)
         return;
@@ -186,5 +186,36 @@ void Renderer_Interaction::apply(ParryProjectile_Wrapper *second)
     QPoint dPos = QPoint(-img2.width() * 0.5, -img2.height() * 0.5);
     auto* item = first->scene->addPixmap(QPixmap::fromImage(img2));
     item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
+    item->setScale(first->scale);
+}
+
+void Renderer_Interaction::apply(ShotgunPelletProjectile_Wrapper *second)
+{
+    QSizeF size = second->item->getCollider()->getSize();
+    QPointF pos = second->item->getAbsolutePosition();
+    auto rect = QRect({0, 0}, size.toSize());
+    auto* item = first->scene->addRect(rect, QPen(Qt::yellow), QBrush(Qt::yellow));
+    item->setPos((pos - QPoint(size.width(), size.height())) * first->scale);
+    item->setScale(first->scale);
+}
+
+void Renderer_Interaction::apply(Explosion_Wrapper *second)
+{
+    qreal rad = second->item->getRadius();
+    QPointF pos = second->item->getAbsolutePosition();
+    QBrush brush(Qt::red);
+    auto rect = QRect({0, 0},  QSize(rad * 2.0 * first->scale, rad * 2.0 * first->scale));
+    auto* item = first->scene->addEllipse(rect, QPen(Qt::NoPen), brush);
+    item->setPos((pos - QPointF(rad, rad)) * first->scale);
+    item->setScale(first->scale);
+}
+
+void Renderer_Interaction::apply(Coin_Wrapper *second)
+{
+    QPointF pos = second->item->getAbsolutePosition();
+    QPointF dPos = QPointF(second->item->getCollider()->getSize().width(), second->item->getCollider()->getSize().height());
+    auto rect = QRect({0, 0}, second->item->getCollider()->getSize().toSize());
+    auto* item = first->scene->addRect(rect, QPen(Qt::yellow), QBrush(Qt::yellow));
+    item->setPos((pos - dPos * 0.5) * first->scale);
     item->setScale(first->scale);
 }

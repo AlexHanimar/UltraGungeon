@@ -138,7 +138,7 @@ void EnemyAndre::init()
     dashSpeed = 500.0;
 
     maxDashTimer = 0.5;
-    maxRecoveryTimer = 1.0;
+    maxRecoveryTimer = 2.0;
     maxChargeUpTimer = 0.5;
     dashRadius = 200.0;
 

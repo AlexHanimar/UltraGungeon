@@ -50,39 +50,11 @@ Projectile* pistol2(QPointF pos, QPointF dir)
     return res;
 }
 
-Projectile* pellet(QPointF pos, QPointF dir)
-{
-    dir = normalize(dir);
-    auto* res = new Projectile(300, {6, 6}, pos);
-    res->setVelocity(dir * 500);
-    res->setDamage(0.5);
-    res->setTeam(TEAM::PLAYER);
-    return res;
-}
-
-std::vector<Projectile*> shotgun1(QPointF pos, QPointF dir)
-{
-    qreal angle = 0.1;
-    dir = normalize(dir);
-    std::vector<Projectile*> res;
-    res = {pellet(pos, dir), pellet(pos, rotate(dir, angle)), pellet(pos, rotate(dir, -angle))};
-    return res;
-}
-
 Projectile* shotgun2(QPointF pos, QPointF dir)
 {
-    return pellet(pos, dir);
+    return pistol2(pos, dir);
 }
 Projectile* railgun2(QPointF pos, QPointF dir)
 {
-    return pellet(pos, dir);
-}
-
-Projectile* andreBall(QPointF pos, QPointF dir)
-{
-    auto* res = new Projectile(1000, {10, 10}, pos);
-    res->setDamage(5);
-    res->setVelocity(normalize(dir) * 1000);
-    res->setTeam(TEAM::ENEMY);
-    return res;
+    return pistol2(pos, dir);
 }

@@ -33,47 +33,6 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
 
     auto* level = new Level(model);
     level->init();
-
-    /*auto* entity = new MovableEntity(100, {10, 10}, {500, 500});
-    entity->setVelocity({100, 100});
-    model->addDynamicEntity(wrap(entity));
-    QPoint pos = {600, 500};
-    for(int i = 0;i < 100;i++) {
-        auto* wall = new Wall({10, 10}, 2, 2, pos);
-        model->addStaticEntity(wrap(wall));
-        pos += {0, 10};
-    }
-    pos = {500, 600};
-    for(int i = 0;i < 100;i++) {
-        auto* wall = new Wall({10, 10}, 2, 2, pos);
-        model->addStaticEntity(wrap(wall));
-        pos += {10, 0};
-    }
-
-    auto* player = new PlayerEntity(0, {10, 10}, {1000, 1000});
-    player->init();
-    model->setPlayerEntity(player);
-
-    auto* andre = new EnemyAndre(0, {30, 30}, {1200, 1200});
-    andre->init();
-    model->addDynamicEntity(wrap(andre));
-
-    auto* trigger = new Trigger({200, 200}, {1200, 1200});
-    model->addTrigger(wrap(trigger));
-    trigger = new Trigger({200, 200}, {1500, 1500});
-    model->addTrigger(wrap(trigger));
-
-    auto* door = new Door({100, 100}, 2, 2, {1200, 800});
-    door->setActive(false);
-    model->addStaticEntity(wrap(door));
-
-    QPointF sPos = {1000, 1200};
-    for(int i = 0;i < 20;i++) {
-        auto* filth = new EnemyFilth(0, {10, 10}, sPos);
-        filth->init();
-        model->addDynamicEntity(wrap(filth));
-        sPos += {20, 0};
-    }*/
 }
 
 void MainWindow::paintEvent(QPaintEvent *)
@@ -90,6 +49,10 @@ void MainWindow::paintEvent(QPaintEvent *)
     for(auto* entity : model->getTriggers())
         interact(renderer, entity);
     for(auto* entity : model->getHitscans())
+        interact(renderer, entity);
+    for(auto* entity : model->getExplosions())
+        interact(renderer, entity);
+    for(auto* entity : model->getCoins())
         interact(renderer, entity);
     interact(renderer, model->getPlayerEntity());
     delete renderer;
