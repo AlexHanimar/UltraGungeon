@@ -208,6 +208,12 @@ protected:
     std::vector<AbstractWrapper*> coins;
 
     int difficulty = 1;
+
+    qreal playerHealth;
+
+    bool markedForDeletion = false;
+
+    int enemyCount = 0;
 public:
     Model();
     void update(qreal deltaT);
@@ -231,8 +237,17 @@ public:
     void setInputMask(int _inputMask);
     void setMouseDirection(QPointF _mouseDirection);
 
-    void clear();
     void setDifficulty(int _difficulty);
+    void setPlayerHealth(qreal _health);
 
     [[nodiscard("Model::getDifficulty() unused")]] int getDifficulty() const;
+
+    [[nodiscard("Model::getPlayerHealth() unused")]] qreal getPlayerHealth() const;
+
+    [[nodiscard("Model::isMarkedForDeletion() unused")]] bool isMarkedForDeletion() const;
+
+    [[nodiscard("Model::getEnemyCount() unused")]] int getEnemyCount() const;
+    void addKill();
+
+    ~Model();
 };

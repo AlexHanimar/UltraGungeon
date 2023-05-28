@@ -16,10 +16,10 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
         , screenCenter(1000, 1000)
         , inputMask(0)
         , scale(1.0)
+        , model(new Model)
 {
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, [this](){this->onFrameStart();});
-    model = new Model;
     timer->start(millisecondsPerFrame);
 
     scene->setBackgroundBrush(Qt::black);
@@ -56,6 +56,7 @@ void MainWindow::paintEvent(QPaintEvent *)
         interact(renderer, entity);
     interact(renderer, model->getPlayerEntity());
     delete renderer;
+
     view->viewport()->update();
     this->setCentralWidget(view);
     centralWidget()->setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -137,12 +138,14 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 
 void MainWindow::onFrameStart()
 {
-    //timer->stop();
+    timer->stop();
     model->setInputMask(inputMask);
     model->setMouseDirection(mouseDirection);
     model->update(0.001 * millisecondsPerFrame);
+    if(model->getPlayerHealth() <= 0.0)
+        this->close();
     repaint();
-    //timer->start(millisecondsPerFrame);
+    timer->start(millisecondsPerFrame);
 }
 
 void MainWindow::wheelEvent(QWheelEvent *event)

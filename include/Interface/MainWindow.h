@@ -7,6 +7,7 @@
 
 #include <Model/Model.h>
 #include <Interface/Renderer.h>
+#include <Model/Level.h>
 
 class GraphicsView : public QGraphicsView {
 Q_OBJECT
@@ -31,6 +32,11 @@ private:
     int inputMask;
     qreal scale;
     QPoint mouseDirection;
+
+
+
+    void restart();
+    void advance();
 public:
     explicit MainWindow(int _millisecondsPerFrame, QSize _sceneSize);
     void onFrameStart();

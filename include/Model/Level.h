@@ -12,4 +12,5 @@ private:
 public:
     explicit Level(Model* _model);
     void init();
+    ~Level();
 };

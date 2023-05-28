@@ -206,6 +206,8 @@ void PlayerEntity::init()
     dashSpeed = 500.0;
     maxDashTimer = 0.1;
     maxDashRechargeTimer = 0.5;
+    dashTimer = 0.0;
+    dashRechargeTimer = 0.0;
     health = 10.0;
     maxHealth = 10.0;
     maxReloadTimer = {0.35, 0.7, 10.0};
@@ -217,6 +219,8 @@ void PlayerEntity::init()
     parryHitbox = new AbstractHitbox({20, 20}, {0, 0}, this);
     maxParryTimer = 0.1;
     maxParryRecoveryTimer = 1.0;
+    parryTimer = 0.0;
+    parryRecoveryTimer = 0.0;
 
     setState(PlayerEntity::STATE::DEFAULT);
     setSpawnAction(PlayerEntity::SPAWN_ACTION::NONE);

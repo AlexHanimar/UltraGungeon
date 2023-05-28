@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <QDebug>
 #include <iostream>
+#include <random>
 
 // Time interaction
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -293,11 +294,19 @@ void Spawn_Interaction::apply(Trigger_Wrapper *second)
     if(second->item->getState() == Trigger::STATE::TRIGGERED && !second->item->isUsed()) {
         second->item->setUsed(true);
         QPointF pos = second->item->getAbsolutePosition();
+        std::mt19937 mt(time(NULL));
+        std::uniform_real_distribution<qreal> rnd(0.0, 100.0);
         for(int i = 0;i < first->item->getDifficulty() / 2;i++) {
             // spawn andre
+            QPointF dPos = {rnd(mt), rnd(mt)};
+            auto* andre = new EnemyAndre(pos + dPos);
+            first->item->addDynamicEntity(wrap(andre));
         }
         for(int i = 0;i < 10  * first->item->getDifficulty();i++) {
             // spawn filth
+            QPointF dPos = {rnd(mt), rnd(mt)};
+            auto* filth = new EnemyFilth(pos + dPos);
+            first->item->addDynamicEntity(wrap(filth));
         }
     }
 }
@@ -363,12 +372,37 @@ AbstractInteraction *Despawn_Wrapper::generateInteraction()
 
 void Despawn_Wrapper::accept(AbstractInteraction *interaction) {}
 
-void Despawn_Interaction::apply(Wall_Wrapper *second) {}
-void Despawn_Interaction::apply(Door_Wrapper *second) {}
-void Despawn_Interaction::apply(MovableEntity_Wrapper *second) {}
-void Despawn_Interaction::apply(PlayerEntity_Wrapper *second) {}
+void Despawn_Interaction::apply(Wall_Wrapper *second)
+{
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
+}
+void Despawn_Interaction::apply(Door_Wrapper *second)
+{
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
+}
+void Despawn_Interaction::apply(MovableEntity_Wrapper *second)
+{
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
+}
+void Despawn_Interaction::apply(PlayerEntity_Wrapper *second)
+{
+    first->item->setPlayerHealth(second->item->getHealth());
+}
 void Despawn_Interaction::apply(Projectile_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getState() == Projectile::STATE::DESTROYED) {
         delete second->item;
         second->markedForDeletion = true;
@@ -376,21 +410,41 @@ void Despawn_Interaction::apply(Projectile_Wrapper *second)
 }
 void Despawn_Interaction::apply(EnemyFilth_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getHealth() <= 0) {
+        first->item->addKill();
         delete second->item;
         second->markedForDeletion = true;
     }
 }
 void Despawn_Interaction::apply(EnemyAndre_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getHealth() <= 0) {
+        first->item->addKill();
         delete second->item;
         second->markedForDeletion = true;
     }
 }
-void Despawn_Interaction::apply(Trigger_Wrapper *second) {}
+void Despawn_Interaction::apply(Trigger_Wrapper *second)
+{
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
+}
 void Despawn_Interaction::apply(Hitscan_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getState() == Hitscan::STATE::DESTROYED) {
         delete second->item;
         second->markedForDeletion = true;
@@ -398,6 +452,10 @@ void Despawn_Interaction::apply(Hitscan_Wrapper *second)
 }
 void Despawn_Interaction::apply(PistolHitscan_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getState() == Hitscan::STATE::DESTROYED) {
         delete second->item;
         second->markedForDeletion = true;
@@ -405,6 +463,10 @@ void Despawn_Interaction::apply(PistolHitscan_Wrapper *second)
 }
 void Despawn_Interaction::apply(BlueRailgunHitscan_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getState() == Hitscan::STATE::DESTROYED) {
         delete second->item;
         second->markedForDeletion = true;
@@ -412,6 +474,10 @@ void Despawn_Interaction::apply(BlueRailgunHitscan_Wrapper *second)
 }
 void Despawn_Interaction::apply(AndreBallProjectile_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getState() == AndreBallProjectile::STATE::DESTROYED) {
         QPointF pos = second->item->getAbsolutePosition();
         first->item->addExplosion(wrap(new Explosion(pos, 20, 3)));
@@ -421,6 +487,10 @@ void Despawn_Interaction::apply(AndreBallProjectile_Wrapper *second)
 }
 void Despawn_Interaction::apply(ParryProjectile_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getState() == ParryProjectile::STATE::DESTROYED) {
         QPointF pos = second->item->getAbsolutePosition();
         first->item->addExplosion(wrap(new Explosion(pos, 20, 3)));
@@ -430,6 +500,10 @@ void Despawn_Interaction::apply(ParryProjectile_Wrapper *second)
 }
 void Despawn_Interaction::apply(ShotgunPelletProjectile_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getState() == ShotgunPelletProjectile::STATE::DESTROYED) {
         delete second->item;
         second->markedForDeletion = true;
@@ -437,6 +511,10 @@ void Despawn_Interaction::apply(ShotgunPelletProjectile_Wrapper *second)
 }
 void Despawn_Interaction::apply(Explosion_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getState() == Explosion::STATE::DESTROYED) {
         delete second->item;
         second->markedForDeletion = true;
@@ -444,6 +522,10 @@ void Despawn_Interaction::apply(Explosion_Wrapper *second)
 }
 void Despawn_Interaction::apply(Coin_Wrapper *second)
 {
+    if(first->item->isMarkedForDeletion()) {
+        delete second->item;
+        return;
+    }
     if(second->item->getState() == Coin::STATE::DESTROYED) {
         delete second->item;
         second->markedForDeletion = true;
@@ -523,7 +605,7 @@ void Model::update(qreal deltaT)
         interact(trigger, playerEntity);
     for(auto* trigger : triggers)
         interact(triggerManager, trigger);
-    *triggerManager->livingEnemiesPresent = false;
+    delete triggerManager;
 
     // updating input
     interact(inputWrapper, playerEntity);
@@ -602,6 +684,9 @@ void Model::update(qreal deltaT)
         interact(coin, coin);
 
     // triggers
+    triggerManager = new TriggerManager_Wrapper;
+    triggerManager->livingEnemiesPresent = new bool(false);
+    triggerManager->activeTriggersPresent = new bool(false);
     for(auto* entity : dynamicEntities)
         interact(triggerManager, entity);
     for(auto* trigger : triggers)
@@ -641,6 +726,8 @@ void Model::update(qreal deltaT)
     std::erase_if(hitscans, [](AbstractWrapper* w){return w->markedForDeletion;});
     std::erase_if(explosions, [](AbstractWrapper* w){return w->markedForDeletion;});
     std::erase_if(coins, [](AbstractWrapper* w){return w->markedForDeletion;});
+
+    interact(despawnWrapper, playerEntity);
 }
 
 void Model::addStaticEntity(AbstractWrapper *entity)
@@ -723,16 +810,6 @@ void Model::setPlayerEntity(PlayerEntity *player)
     playerEntity = wrap(player);
 }
 
-
-void Model::clear()
-{
-    staticEntities.clear();
-    dynamicEntities.clear();
-    hitscans.clear();
-    explosions.clear();
-    coins.clear();
-}
-
 int Model::getDifficulty() const
 {
     return difficulty;
@@ -741,4 +818,60 @@ int Model::getDifficulty() const
 void Model::setDifficulty(int _difficulty)
 {
     difficulty = _difficulty;
+}
+
+qreal Model::getPlayerHealth() const
+{
+    return playerHealth;
+}
+
+void Model::setPlayerHealth(qreal _health)
+{
+    playerHealth = _health;
+}
+
+bool Model::isMarkedForDeletion() const
+{
+    return markedForDeletion;
+}
+
+Model::~Model()
+{
+    markedForDeletion = true;
+    delete spawnWrapper;
+    delete despawnWrapper;
+    delete inputWrapper;
+
+    despawnWrapper = new Despawn_Wrapper(this);
+    for(auto* entity : triggers)
+        interact(despawnWrapper, entity);
+    for(auto* entity : staticEntities)
+        interact(despawnWrapper, entity);
+    for(auto* entity : dynamicEntities)
+        interact(despawnWrapper, entity);
+    for(auto* entity : explosions)
+        interact(despawnWrapper, entity);
+    for(auto* entity : hitscans)
+        interact(despawnWrapper, entity);
+    for(auto* entity : coins)
+        interact(despawnWrapper, entity);
+    delete despawnWrapper;
+    delete playerEntity;
+
+    triggers.clear();
+    staticEntities.clear();
+    dynamicEntities.clear();
+    hitscans.clear();
+    explosions.clear();
+    coins.clear();
+}
+
+void Model::addKill()
+{
+    enemyCount++;
+}
+
+int Model::getEnemyCount() const
+{
+    return enemyCount;
 }

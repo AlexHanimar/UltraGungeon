@@ -1,19 +1,6 @@
 #include <Model/Level.h>
 #include <QDebug>
 
-QSize mapSizeRooms(4, 4);
-QSize roomSizeBlocks(20, 20);
-QSize blockSize(50, 50);
-
-QSize roomSize(blockSize.width() * roomSizeBlocks.width(), blockSize.height() * roomSizeBlocks.height());
-QSizeF triggerSize(roomSize.width() - blockSize.width() * 4, roomSize.height() - blockSize.height() * 4);
-
-QPointF topLeftCorner(10000, 10000);
-QPointF roomCenterOffset(qreal(roomSize.width()) * 0.5, qreal(roomSize.height()) * 0.5);
-QPointF blockCenterOffset(qreal(blockSize.width()) * 0.5, qreal(blockSize.height()) * 0.5);
-
-qreal wallOffset = 6.0;
-
 Level::Level(Model *_model)
 {
     model = _model;
@@ -23,6 +10,19 @@ Level::Level(Model *_model)
 
 void Level::init()
 {
+    QSize mapSizeRooms(6, 6);
+    QSize roomSizeBlocks(20, 20);
+    QSize blockSize(50, 50);
+
+    QSize roomSize(blockSize.width() * roomSizeBlocks.width(), blockSize.height() * roomSizeBlocks.height());
+    QSizeF triggerSize(roomSize.width() - blockSize.width() * 4, roomSize.height() - blockSize.height() * 4);
+
+    QPointF topLeftCorner(10000, 10000);
+    QPointF roomCenterOffset(qreal(roomSize.width()) * 0.5, qreal(roomSize.height()) * 0.5);
+    QPointF blockCenterOffset(qreal(blockSize.width()) * 0.5, qreal(blockSize.height()) * 0.5);
+
+    qreal wallOffset = 6.0;
+
     auto mapGrid = mapGen->generateMap(mapSizeRooms.width(), mapSizeRooms.height());
     QPointF mapRowStart(topLeftCorner);
     QPointF mapRowShift(0, roomSize.height());
@@ -40,7 +40,7 @@ void Level::init()
                 player->init();
                 model->setPlayerEntity(player);
             }
-            if(mapGrid[mapRow][mapCol] != ROOM_TYPE::ENTRANCE) {
+            else {
                 auto* trigger = new Trigger(triggerSize, roomTopLeftCorner + roomCenterOffset);
                 model->addTrigger(wrap(trigger));
             }
@@ -74,4 +74,11 @@ void Level::init()
         }
         mapRowStart += mapRowShift;
     }
+    model->setDifficulty(4);
+}
+
+Level::~Level()
+{
+    delete mapGen;
+    delete roomGen;
 }
