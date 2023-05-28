@@ -87,4 +87,11 @@ public:
     [[nodiscard("PlayerENtity::getMaxHealth() unused")]] qreal getMaxHealth() const;
 
     void init();
+
+    [[nodiscard("PlayerEntity::healthRatio() unused")]] qreal healthRatio() const;
+    [[nodiscard("PlayerEntity::dashRatio() unused")]] qreal dashRatio() const;
+    [[nodiscard("PlayerEntity::w1Ratio() unused")]] qreal w1Ratio() const;
+    [[nodiscard("PlayerEntity::w2Ratio() unused")]] qreal w2Ratio() const;
+    [[nodiscard("PlayerEntity::w3Ratio() unused")]] qreal w3Ratio() const;
+    [[nodiscard("PlayerEntity::w3Ratio() unused")]] qreal parryRatio() const;
 };

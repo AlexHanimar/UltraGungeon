@@ -4,7 +4,7 @@
 
 Coin::Coin(QPointF pos, QPointF dir, QPointF velocity) : MovableEntity(1000000, {10, 10}, pos)
 {
-    Coin::setVelocity(normalize(dir) * 50 + velocity);
+    Coin::setVelocity(normalize(dir) * 100 + velocity);
     state = Coin::STATE::ACTIVE;
     spawnAction = Coin::SPAWN_ACTION::NONE;
     lifeTime = maxLifeTime;

@@ -222,3 +222,34 @@ void PlayerEntity::init()
     setSpawnAction(PlayerEntity::SPAWN_ACTION::NONE);
     setParryState(PlayerEntity::PARRY_STATE::PARRY_DEFAULT);
 }
+
+
+qreal PlayerEntity::healthRatio() const
+{
+    return health / maxHealth;
+}
+
+qreal PlayerEntity::dashRatio() const
+{
+    return 1.0 - (dashRechargeTimer / maxDashRechargeTimer);
+}
+
+qreal PlayerEntity::w1Ratio() const
+{
+    return 1.0 - reloadTimer[0] / maxReloadTimer[0];
+}
+
+qreal PlayerEntity::w2Ratio() const
+{
+    return 1.0 - reloadTimer[1] / maxReloadTimer[1];
+}
+
+qreal PlayerEntity::w3Ratio() const
+{
+    return 1.0 - reloadTimer[2] / maxReloadTimer[2];
+}
+
+qreal PlayerEntity::parryRatio() const
+{
+    return 1.0 - parryRecoveryTimer / maxParryRecoveryTimer;
+}

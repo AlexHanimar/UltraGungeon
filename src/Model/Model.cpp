@@ -142,14 +142,18 @@ void Input_Interaction::apply(PlayerEntity_Wrapper *second)
             case PlayerEntity::WEAPON::SHOTGUN:
                 if (*first->item & INPUT::MOUSE_1)
                     second->item->setSpawnAction(PlayerEntity::SPAWN_ACTION::SHOTGUN_1);
-                else if (*first->item & INPUT::MOUSE_2)
-                    second->item->setSpawnAction(PlayerEntity::SPAWN_ACTION::SHOTGUN_2);
+                else
+                    goto _NO_SPAWN_ACTION;
+                /*else if (*first->item & INPUT::MOUSE_2)
+                    second->item->setSpawnAction(PlayerEntity::SPAWN_ACTION::SHOTGUN_2);*/
                 break;
             case PlayerEntity::WEAPON::RAILGUN:
                 if (*first->item & INPUT::MOUSE_1)
                     second->item->setSpawnAction(PlayerEntity::SPAWN_ACTION::RAILGUN_1);
-                else if (*first->item & INPUT::MOUSE_2)
-                    second->item->setSpawnAction(PlayerEntity::SPAWN_ACTION::RAILGUN_2);
+                else
+                    goto _NO_SPAWN_ACTION;
+               /* else if (*first->item & INPUT::MOUSE_2)
+                    second->item->setSpawnAction(PlayerEntity::SPAWN_ACTION::RAILGUN_2);*/
                 break;
             default:
                 break;
@@ -289,11 +293,11 @@ void Spawn_Interaction::apply(Trigger_Wrapper *second)
     if(second->item->getState() == Trigger::STATE::TRIGGERED && !second->item->isUsed()) {
         second->item->setUsed(true);
         QPointF pos = second->item->getAbsolutePosition();
-        first->item->addDynamicEntity(wrap(new EnemyAndre(pos)));
-        for(int i = 0;i < 10;i++) {
-            auto* enemy = new EnemyFilth(pos);
-            first->item->addDynamicEntity(wrap(enemy));
-            pos += {1, 0};
+        for(int i = 0;i < first->item->getDifficulty() / 2;i++) {
+            // spawn andre
+        }
+        for(int i = 0;i < 10  * first->item->getDifficulty();i++) {
+            // spawn filth
         }
     }
 }
@@ -541,6 +545,8 @@ void Model::update(qreal deltaT)
             interact(staticEntity, dynamicEntity);
             interact(dynamicEntity, staticEntity);
         }
+        for(auto* coin : coins)
+            interact(staticEntity, coin);
     }
     for(auto* entity1 : dynamicEntities) {
         for(auto* entity2 : dynamicEntities) {
@@ -715,4 +721,24 @@ AbstractWrapper *Model::getPlayerEntity() const
 void Model::setPlayerEntity(PlayerEntity *player)
 {
     playerEntity = wrap(player);
+}
+
+
+void Model::clear()
+{
+    staticEntities.clear();
+    dynamicEntities.clear();
+    hitscans.clear();
+    explosions.clear();
+    coins.clear();
+}
+
+int Model::getDifficulty() const
+{
+    return difficulty;
+}
+
+void Model::setDifficulty(int _difficulty)
+{
+    difficulty = _difficulty;
 }

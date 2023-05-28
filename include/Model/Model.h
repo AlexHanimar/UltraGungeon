@@ -206,6 +206,8 @@ protected:
     std::vector<AbstractWrapper*> hitscans;
     std::vector<AbstractWrapper*> explosions;
     std::vector<AbstractWrapper*> coins;
+
+    int difficulty = 1;
 public:
     Model();
     void update(qreal deltaT);
@@ -228,4 +230,9 @@ public:
 
     void setInputMask(int _inputMask);
     void setMouseDirection(QPointF _mouseDirection);
+
+    void clear();
+    void setDifficulty(int _difficulty);
+
+    [[nodiscard("Model::getDifficulty() unused")]] int getDifficulty() const;
 };

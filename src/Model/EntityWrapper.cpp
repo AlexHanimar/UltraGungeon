@@ -249,7 +249,11 @@ void Wall_Interaction::apply(ShotgunPelletProjectile_Wrapper *second)
     delete wrapper;
 }
 void Wall_Interaction::apply(Explosion_Wrapper *second) {}
-void Wall_Interaction::apply(Coin_Wrapper *second) {}
+void Wall_Interaction::apply(Coin_Wrapper *second)
+{
+    if(first->item->getCollider()->intersects(second->item->getCollider()))
+        second->item->setState(Coin::STATE::DESTROYED);
+}
 
 void Door_Interaction::apply(Wall_Wrapper *second) {}
 void Door_Interaction::apply(Door_Wrapper *second) {}
@@ -325,7 +329,11 @@ void Door_Interaction::apply(ShotgunPelletProjectile_Wrapper*second)
     delete wrapper;
 }
 void Door_Interaction::apply(Explosion_Wrapper *second) {}
-void Door_Interaction::apply(Coin_Wrapper *second) {}
+void Door_Interaction::apply(Coin_Wrapper *second)
+{
+    if(first->item->isActive() && first->item->getCollider()->intersects(second->item->getCollider()))
+        second->item->setState(Coin::STATE::DESTROYED);
+}
 
 void MovableEntity_Interaction::apply(Wall_Wrapper *second) {}
 void MovableEntity_Interaction::apply(Door_Wrapper *second) {}
@@ -473,7 +481,18 @@ void EnemyAndre_Interaction::apply(PlayerEntity_Wrapper *second)
 }
 void EnemyAndre_Interaction::apply(Projectile_Wrapper *second) {}
 void EnemyAndre_Interaction::apply(EnemyFilth_Wrapper *second) {}
-void EnemyAndre_Interaction::apply(EnemyAndre_Wrapper *second) {}
+void EnemyAndre_Interaction::apply(EnemyAndre_Wrapper *second)
+{
+    if(first == second)
+        return;
+    if(!first->item->getCollider()->intersects(second->item->getCollider()))
+        return;
+    if(second->item->getState() == EnemyAndre::STATE::DASHING)
+        return;
+    auto dir = normalize(second->item->getAbsolutePosition() - first->item->getAbsolutePosition());
+    auto speed = second->item->getMaxSpeed();
+    second->item->setVelocity(second->item->getVelocity() + dir * speed);
+}
 void EnemyAndre_Interaction::apply(Trigger_Wrapper *second) {}
 void EnemyAndre_Interaction::apply(Hitscan_Wrapper *second) {}
 void EnemyAndre_Interaction::apply(PistolHitscan_Wrapper *second) {}
@@ -854,7 +873,7 @@ void Coin_Interaction::apply(EnemyFilth_Wrapper *second)
 void Coin_Interaction::apply(EnemyAndre_Wrapper *second)
 {
     if(first->item->getState() == Coin::STATE::DEADCOIN)
-        first->item->addTarget(second->item, 9);
+        first->item->addTarget(second->item, 10);
 }
 void Coin_Interaction::apply(Trigger_Wrapper *second) {}
 void Coin_Interaction::apply(Hitscan_Wrapper *second) {}

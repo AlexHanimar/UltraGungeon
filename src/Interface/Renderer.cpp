@@ -3,14 +3,15 @@
 
 struct {
     QImage* Wall_Sprite = new QImage("../../sprites/Wall_sprite.png");
-    QImage* Door_Sprite = new QImage("../../sprites/defaultSprite.png");
+    QImage* Door_Sprite = new QImage("../../sprites/Door_sprite.png");
     QImage* MovableEntity_Sprite = new QImage("../../sprites/defaultSprite.png");
-    QImage* PlayerEntity_Sprite = new QImage("../../sprites/defaultSprite.png");
+    QImage* PlayerEntity_Sprite = new QImage("../../sprites/PlayerEntity_sprite.png");
     QImage* Projectile_Sprite = new QImage("../../sprites/defaultSprite.png");
-    QImage* EnemyFilth_Sprite = new QImage("../../sprites/defaultSprite.png");
-    QImage* EnemyAndre_Sprite = new QImage("../../sprites/defaultSprite.png");
+    QImage* EnemyFilth_Sprite = new QImage("../../sprites/Enemy_sprite.png");
+    QImage* EnemyAndre_Sprite = new QImage("../../sprites/Enemy_sprite.png");
     QImage* AndreBallProjectile_Sprite = new QImage("../../sprites/AndreBallProjectile_sprite.png");
     QImage* ParryProjectile_Sprite = new QImage("../../sprites/ParryProjectile_sprite.png");
+    QImage* Coin_Sprite = new QImage("../../sprites/Coin_sprite.png");
 } Sprites;
 
 Renderer_Interaction::~Renderer_Interaction() = default;
@@ -45,12 +46,16 @@ void Renderer_Interaction::apply(Wall_Wrapper *second)
 
 void Renderer_Interaction::apply(Door_Wrapper *second)
 {
-    auto* img = Sprites.Door_Sprite;
-    QImage img2 = img->scaled(second->item->getCollider()->getSize().width(), second->item->getCollider()->getSize().height());
-    QPoint dPos = QPoint(-img2.width() * 0.5, -img2.height() * 0.5);
-    auto* item = first->scene->addPixmap(QPixmap::fromImage(img2));
+    if(!second->item->isActive())
+        return;
+    auto size = second->item->getCollider()->getSize().toSize();
+    auto* img = new QImage(Sprites.Door_Sprite->scaled(size));
+    QPoint dPos = QPoint(-img->width() * 0.5, -img->height() * 0.5);
+    auto* item = first->scene->addPixmap(QPixmap::fromImage(*img));
     item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
     item->setScale(first->scale);
+
+    delete img;
 }
 
 void Renderer_Interaction::apply(MovableEntity_Wrapper *second)
@@ -73,24 +78,29 @@ void Renderer_Interaction::apply(PlayerEntity_Wrapper *second)
         item->setScale(first->scale);
     }
     {
-        auto *img = Sprites.PlayerEntity_Sprite;
-        QPoint dPos = QPoint(-img->width() * 0.5, -img->height() * 0.5);
-        int width = 10 * second->item->getHealth() / second->item->getMaxHealth();
-        auto *item = first->scene->addRect(0, 0, width, 3, QPen(Qt::green), QBrush(Qt::green));
-        item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
-        item->setScale(first->scale);
+        QPoint topLeft  = {100, first->view->size().height() - 100};
+        QPoint diff = topLeft - QPoint(first->view->size().width() / 2, first->view->size().height() / 2);
+        auto* item = first->scene->addRect(0, 0, 400 * (second->item->healthRatio()), 20, QPen(Qt::green), QBrush(Qt::green));
+        item->setPos(second->item->getAbsolutePosition() * first->scale + diff);
+        diff += {0, 30};
+        item = first->scene->addRect(0, 0, 400 * second->item->dashRatio(), 20, QPen(Qt::blue), QBrush(Qt::blue));
+        item->setPos(second->item->getAbsolutePosition() * first->scale + diff);
+        diff += {0, -60};
+        item = first->scene->addRect(0, 0, 90 * second->item->w1Ratio(), 20, QPen(Qt::cyan), QBrush(Qt::cyan));
+        item->setPos(second->item->getAbsolutePosition() * first->scale + diff);
+        diff += {100, 0};
+        item = first->scene->addRect(0, 0, 90 * second->item->w2Ratio(), 20, QPen(Qt::cyan), QBrush(Qt::cyan));
+        item->setPos(second->item->getAbsolutePosition() * first->scale + diff);
+        diff += {100, 0};
+        item = first->scene->addRect(0, 0, 90 * second->item->w3Ratio(), 20, QPen(Qt::cyan), QBrush(Qt::cyan));
+        item->setPos(second->item->getAbsolutePosition() * first->scale + diff);
+        diff += {100, 0};
+        item = first->scene->addRect(0, 0, 5, 20, QPen(Qt::cyan), QBrush(Qt::cyan));
+        item->setPos(second->item->getAbsolutePosition() * first->scale + diff);
+        diff += {-300, -30};
+        item = first->scene->addRect(0, 0, 400 * second->item->parryRatio(), 20, QPen(Qt::darkGreen), QBrush(Qt::darkGreen));
+        item->setPos(second->item->getAbsolutePosition() * first->scale + diff);
     }
-    {
-        auto size = second->item->getParryHitbox()->getSize();
-        int width = size.width(), height = size.height();
-        auto col = Qt::red;
-        if(second->item->getParryState() == PlayerEntity::PARRY_STATE::PARRY_ACTIVE)
-            col = Qt::green;
-        auto* item = first->scene->addRect(-width * 0.5, -height * 0.5, width, height, QPen(col));
-        item->setPos((second->item->getParryHitbox()->getAbsolutePosition()) * first->scale);
-        item->setScale(first->scale);
-    }
-
 }
 
 void Renderer_Interaction::apply(Projectile_Wrapper *second)
@@ -213,9 +223,11 @@ void Renderer_Interaction::apply(Explosion_Wrapper *second)
 void Renderer_Interaction::apply(Coin_Wrapper *second)
 {
     QPointF pos = second->item->getAbsolutePosition();
+    auto* img = new QImage(Sprites.Coin_Sprite->scaled(second->item->getCollider()->getSize().toSize()));
     QPointF dPos = QPointF(second->item->getCollider()->getSize().width(), second->item->getCollider()->getSize().height());
-    auto rect = QRect({0, 0}, second->item->getCollider()->getSize().toSize());
-    auto* item = first->scene->addRect(rect, QPen(Qt::yellow), QBrush(Qt::yellow));
-    item->setPos((pos - dPos * 0.5) * first->scale);
+    auto* item = first->scene->addPixmap(QPixmap::fromImage(*img));
+    item->setPos((pos - dPos) * first->scale);
     item->setScale(first->scale);
+
+    delete img;
 }
