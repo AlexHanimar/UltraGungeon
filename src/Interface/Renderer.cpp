@@ -9,11 +9,12 @@ struct {
     QImage* Projectile_Sprite = new QImage("../../sprites/defaultSprite.png");
     QImage* EnemyFilth_Sprite = new QImage("../../sprites/defaultSprite.png");
     QImage* EnemyAndre_Sprite = new QImage("../../sprites/defaultSprite.png");
-    QImage* AndreBall_Sprite = new QImage("../../sprites/AndreBallProjectile_sprite.png");
+    QImage* AndreBallProjectile_Sprite = new QImage("../../sprites/AndreBallProjectile_sprite.png");
+    QImage* ParryProjectile_Sprite = new QImage("../../sprites/ParryProjectile_sprite.png");
 } Sprites;
 
-Renderer_Interaction::~Renderer_Interaction() noexcept {}
-Renderer_Wrapper::~Renderer_Wrapper() noexcept
+Renderer_Interaction::~Renderer_Interaction() = default;
+Renderer_Wrapper::~Renderer_Wrapper()
 {
     scene = nullptr;
     view = nullptr;
@@ -38,6 +39,8 @@ void Renderer_Interaction::apply(Wall_Wrapper *second)
     auto* item = first->scene->addPixmap(QPixmap::fromImage(*img));
     item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
     item->setScale(first->scale);
+
+    delete img;
 }
 
 void Renderer_Interaction::apply(Door_Wrapper *second)
@@ -126,7 +129,9 @@ void Renderer_Interaction::apply(EnemyAndre_Wrapper *second)
 void Renderer_Interaction::apply(Trigger_Wrapper *second)
 {
     auto col = Qt::green;
-    if(second->item->isTriggered())
+    if(second->item->getState() == Trigger::STATE::TRIGGERED)
+        col = Qt::blue;
+    if(second->item->getState() == Trigger::STATE::DISABLED)
         col = Qt::red;
     QPoint dPos = QPoint(-second->item->getSize().width() * 0.5, -second->item->getSize().height() * 0.5);
     QRect rect(dPos + QPoint(second->item->getAbsolutePosition().x(), second->item->getAbsolutePosition().y()),
@@ -164,7 +169,18 @@ void Renderer_Interaction::apply(BlueRailcannonHitscan_Wrapper *second)
 
 void Renderer_Interaction::apply(AndreBallProjectile_Wrapper *second)
 {
-    auto* img = Sprites.AndreBall_Sprite;
+    auto* img = Sprites.AndreBallProjectile_Sprite;
+    QSizeF size = second->item->getCollider()->getSize();
+    QImage img2 = img->scaled(size.width(), size.height());
+    QPoint dPos = QPoint(-img2.width() * 0.5, -img2.height() * 0.5);
+    auto* item = first->scene->addPixmap(QPixmap::fromImage(img2));
+    item->setPos((second->item->getAbsolutePosition() + dPos) * first->scale);
+    item->setScale(first->scale);
+}
+
+void Renderer_Interaction::apply(ParryProjectile_Wrapper *second)
+{
+    auto* img = Sprites.ParryProjectile_Sprite;
     QSizeF size = second->item->getCollider()->getSize();
     QImage img2 = img->scaled(size.width(), size.height());
     QPoint dPos = QPoint(-img2.width() * 0.5, -img2.height() * 0.5);

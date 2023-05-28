@@ -13,6 +13,8 @@ set(HEADER_LIST
         ../../include/Entities/PistolHitscan.h
         ../../include/Entities/BlueRailcannonHitscan.h
         ../../include/Entities/AndreBallProjectile.h
+        ../../include/Entities/ParryProjectile.h
+        ../../include/Entities/ShotgunPelletProjectile.h
         )
 
 set(SOURCE_LIST
@@ -29,6 +31,8 @@ set(SOURCE_LIST
         PistolHitscan.cpp
         BlueRailcannonHitscan.cpp
         AndreBallProjectile.cpp
+        ParryProjectile.cpp
+        ShotgunPelletProjectile.cpp
         )
 
 add_library(Entities ${SOURCE_LIST} ${HEADER_LIST})

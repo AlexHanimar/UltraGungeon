@@ -91,3 +91,9 @@ void EnemyFilth::init()
     dashRadius = 100.0;
     setState(EnemyFilth::DEFAULT);
 }
+
+EnemyFilth::EnemyFilth(QPointF pos)
+    : AbstractEnemy(0, {10, 10}, pos)
+{
+    EnemyFilth::init();
+}

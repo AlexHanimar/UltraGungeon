@@ -23,7 +23,7 @@ protected:
     int spawnAction;
     QPointF spawnDirection;
 public:
-    using AbstractEnemy::AbstractEnemy;
+    EnemyAndre(QPointF pos);
 
     enum STATE {
         DEFAULT = 0,

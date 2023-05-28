@@ -133,14 +133,19 @@ void EnemyAndre::init()
     maxHealth = 30.0;
     bodyDamage = 3.0;
 
-    defaultSpeed = 30.0;
-    recoverySpeed = 30.0;
+    defaultSpeed = 50.0;
+    recoverySpeed = 50.0;
     dashSpeed = 500.0;
 
     maxDashTimer = 0.5;
-    maxRecoveryTimer = 3.0;
+    maxRecoveryTimer = 1.0;
     maxChargeUpTimer = 0.5;
     dashRadius = 200.0;
 
     setState(EnemyAndre::STATE::DEFAULT);
+}
+
+EnemyAndre::EnemyAndre(QPointF pos) : AbstractEnemy(0, {20, 20}, pos)
+{
+    EnemyAndre::init();
 }

@@ -1,17 +1,21 @@
 set(HEADER_LIST
         ../../include/Model/Model.h
-        ../../include/Model/EntityWrapper.h)
+        ../../include/Model/EntityWrapper.h
+        ../../include/Model/Level.h
+        )
 
 set(SOURCE_LIST
         Model.cpp
-        EntityWrapper.cpp)
+        EntityWrapper.cpp
+        Level.cpp
+        )
 
 add_library(Model ${SOURCE_LIST} ${HEADER_LIST})
 
 target_include_directories(Model PUBLIC ../../include)
 
 
-target_link_libraries(Model PRIVATE Entities)
+target_link_libraries(Model PRIVATE Entities MapGenerator)
 
 
 set(CMAKE_PREFIX_PATH "C:/Qt/6.5.0/mingw_64/lib/cmake;D:/Qt/6.5.0/mingw_64/lib/cmake")

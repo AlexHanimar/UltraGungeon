@@ -1,6 +1,7 @@
 #include <Interface/MainWindow.h>
 #include <QKeyEvent>
 #include <QGraphicsItem>
+#include <Model/Level.h>
 
 void GraphicsView::wheelEvent(QWheelEvent *event) {event->ignore();}
 void GraphicsView::mousePressEvent(QMouseEvent *event) {event->ignore();}
@@ -20,6 +21,8 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
     connect(timer, &QTimer::timeout, [this](){this->onFrameStart();});
     model = new Model;
     timer->start(millisecondsPerFrame);
+
+    scene->setBackgroundBrush(Qt::black);
     showFullScreen();
     view->setFixedSize(this->size());
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -28,7 +31,10 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
     screenCenter = {this->size().width() / 2, this->size().height() / 2};
     this->setMouseTracking(true);
 
-    auto* entity = new MovableEntity(100, {10, 10}, {500, 500});
+    auto* level = new Level(model);
+    level->init();
+
+    /*auto* entity = new MovableEntity(100, {10, 10}, {500, 500});
     entity->setVelocity({100, 100});
     model->addDynamicEntity(wrap(entity));
     QPoint pos = {600, 500};
@@ -54,6 +60,8 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
 
     auto* trigger = new Trigger({200, 200}, {1200, 1200});
     model->addTrigger(wrap(trigger));
+    trigger = new Trigger({200, 200}, {1500, 1500});
+    model->addTrigger(wrap(trigger));
 
     auto* door = new Door({100, 100}, 2, 2, {1200, 800});
     door->setActive(false);
@@ -65,7 +73,7 @@ MainWindow::MainWindow(int _millisecondsPerFrame, QSize _sceneSize)
         filth->init();
         model->addDynamicEntity(wrap(filth));
         sPos += {20, 0};
-    }
+    }*/
 }
 
 void MainWindow::paintEvent(QPaintEvent *)
@@ -166,12 +174,12 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 
 void MainWindow::onFrameStart()
 {
-    timer->stop();
+    //timer->stop();
     model->setInputMask(inputMask);
     model->setMouseDirection(mouseDirection);
     model->update(0.001 * millisecondsPerFrame);
     repaint();
-    timer->start(millisecondsPerFrame);
+    //timer->start(millisecondsPerFrame);
 }
 
 void MainWindow::wheelEvent(QWheelEvent *event)

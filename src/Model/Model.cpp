@@ -53,6 +53,10 @@ void Time_Interaction::apply(AndreBallProjectile_Wrapper *second)
 {
     second->item->update(*first->item);
 }
+void Time_Interaction::apply(ParryProjectile_Wrapper *second)
+{
+    second->item->update(*first->item);
+}
 
 Time_Wrapper::~Time_Wrapper() {delete item;}
 Time_Interaction::~Time_Interaction() {}
@@ -151,6 +155,7 @@ void Input_Interaction::apply(Hitscan_Wrapper *second) {}
 void Input_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void Input_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void Input_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void Input_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
 Input_Wrapper::~Input_Wrapper()
 {
@@ -238,9 +243,8 @@ void Spawn_Interaction::apply(PlayerEntity_Wrapper *second)
             break;
         case PlayerEntity::SPAWN_ACTION::PARRY:
         {
-            auto* projectile = andreBall(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
+            auto* projectile = new ParryProjectile(second->item->getAbsolutePosition(), second->item->getSpawnDirection());
             second->item->setSpawnAction(PlayerEntity::SPAWN_ACTION::NONE);
-            projectile->setTeam(TEAM::PLAYER);
             first->item->addDynamicEntity(wrap(projectile));
         }
         default:
@@ -265,16 +269,39 @@ void Spawn_Interaction::apply(EnemyAndre_Wrapper *second)
             break;
     }
 }
-void Spawn_Interaction::apply(Trigger_Wrapper *second) {}
+void Spawn_Interaction::apply(Trigger_Wrapper *second)
+{
+    if(second->item->getState() == Trigger::STATE::TRIGGERED && !second->item->isUsed()) {
+        second->item->setUsed(true);
+        QPointF pos = second->item->getAbsolutePosition();
+        first->item->addDynamicEntity(wrap(new EnemyAndre(pos)));
+        for(int i = 0;i < 10;i++) {
+            auto* enemy = new EnemyFilth(pos);
+            first->item->addDynamicEntity(wrap(enemy));
+            pos += {1, 0};
+        }
+    }
+}
 void Spawn_Interaction::apply(Hitscan_Wrapper *second) {}
 void Spawn_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void Spawn_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
-void Spawn_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void Spawn_Interaction::apply(AndreBallProjectile_Wrapper *second)
+{
+    if(second->item->getState() == AndreBallProjectile::STATE::DESTROYED) {
+        // spawn explosion
+    }
+}
+void Spawn_Interaction::apply(ParryProjectile_Wrapper *second)
+{
+    if(second->item->getState() == ParryProjectile::STATE::DESTROYED) {
+        // spawn explosion
+    }
+}
 
 AbstractWrapper* wrap(Model* item) {auto wrapper = new Spawn_Wrapper; wrapper->item = item; return wrapper;}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-// Spawn interaction
+// Despawn interaction
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 AbstractInteraction *Despawn_Wrapper::generateInteraction()
 {
@@ -339,6 +366,65 @@ void Despawn_Interaction::apply(AndreBallProjectile_Wrapper *second)
         second->markedForDeletion = true;
     }
 }
+void Despawn_Interaction::apply(ParryProjectile_Wrapper *second)
+{
+    if(second->item->getState() == AndreBallProjectile::STATE::DESTROYED) {
+        delete second->item;
+        second->markedForDeletion = true;
+    }
+}
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+// Trigger manager
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+AbstractInteraction *TriggerManager_Wrapper::generateInteraction()
+{
+    auto* inter = new TriggerManager_Interaction;
+    inter->first = this;
+    return inter;
+}
+
+void TriggerManager_Wrapper::accept(AbstractInteraction *interaction) {}
+
+void TriggerManager_Interaction::apply(Wall_Wrapper *second) {}
+void TriggerManager_Interaction::apply(Door_Wrapper *second)
+{
+    second->item->setActive(*first->activeTriggersPresent);
+}
+void TriggerManager_Interaction::apply(MovableEntity_Wrapper *second) {}
+void TriggerManager_Interaction::apply(PlayerEntity_Wrapper *second) {}
+void TriggerManager_Interaction::apply(Projectile_Wrapper *second) {}
+void TriggerManager_Interaction::apply(EnemyFilth_Wrapper *second)
+{
+    if(second->item->getHealth() > 0)
+        *first->livingEnemiesPresent = true;
+}
+void TriggerManager_Interaction::apply(EnemyAndre_Wrapper *second)
+{
+    if(second->item->getHealth() > 0)
+        *first->livingEnemiesPresent = true;
+}
+void TriggerManager_Interaction::apply(Trigger_Wrapper *second)
+{
+    if(!*first->livingEnemiesPresent) {
+        if(second->item->getState() == Trigger::STATE::TRIGGERED)
+            second->item->setState(Trigger::STATE::DISABLED);
+    }
+    if(second->item->getState() == Trigger::STATE::TRIGGERED)
+        *first->activeTriggersPresent = true;
+}
+void TriggerManager_Interaction::apply(Hitscan_Wrapper *second) {}
+void TriggerManager_Interaction::apply(PistolHitscan_Wrapper *second) {}
+void TriggerManager_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
+void TriggerManager_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void TriggerManager_Interaction::apply(ParryProjectile_Wrapper *second) {}
+
+TriggerManager_Wrapper::~TriggerManager_Wrapper()
+{
+    delete activeTriggersPresent;
+    delete livingEnemiesPresent;
+}
+TriggerManager_Interaction::~TriggerManager_Interaction() = default;
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Model::Model()
@@ -348,14 +434,15 @@ Model::Model()
 
 void Model::update(qreal deltaT)
 {
-    // triggers
-    for(auto* trigger : triggers) {
+    // checking triggers
+    auto* triggerManager = new TriggerManager_Wrapper;
+    triggerManager->activeTriggersPresent = new bool(false);
+    triggerManager->livingEnemiesPresent = new bool(true);
+    for(auto* trigger : triggers)
         interact(trigger, playerEntity);
-        for(auto* entity : dynamicEntities)
-            interact(trigger, entity);
-        for(auto* entity : staticEntities)
-            interact(trigger, entity);
-    }
+    for(auto* trigger : triggers)
+        interact(triggerManager, trigger);
+    *triggerManager->livingEnemiesPresent = false;
 
     // updating input
     interact(inputWrapper, playerEntity);
@@ -366,6 +453,8 @@ void Model::update(qreal deltaT)
         interact(spawnWrapper, entity);
     for(auto* entity : dynamicEntities)
         interact(spawnWrapper, entity);
+    for(auto* trigger : triggers)
+        interact(spawnWrapper, trigger);
 
     // paired interactions
     for(auto* staticEntity : staticEntities) {
@@ -399,7 +488,17 @@ void Model::update(qreal deltaT)
     // self update
     for(auto* hitscan : hitscans)
         interact(hitscan, hitscan);
+    for(auto* trigger : triggers)
+        interact(trigger, trigger);
 
+    // triggers
+    for(auto* entity : dynamicEntities)
+        interact(triggerManager, entity);
+    for(auto* trigger : triggers)
+        interact(triggerManager, trigger);
+    for(auto* entity : staticEntities)
+        interact(triggerManager, entity);
+    delete triggerManager;
     // time update
     auto* timeWrapper = wrap(new qreal(deltaT));
     for(auto* entity : dynamicEntities) {

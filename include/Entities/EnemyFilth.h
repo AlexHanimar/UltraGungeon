@@ -16,7 +16,7 @@ protected:
     qreal dashRadius;
     bool hitboxActive;
 public:
-    using AbstractEnemy::AbstractEnemy;
+    EnemyFilth(QPointF pos);
 
     enum STATE {
         DEFAULT = 0,

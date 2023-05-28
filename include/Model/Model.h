@@ -15,7 +15,7 @@ struct Time_Wrapper : public AbstractWrapper {
     qreal* item;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
-    ~Time_Wrapper();
+    ~Time_Wrapper() override;
 };
 struct Time_Interaction : public AbstractInteraction {
     Time_Wrapper* first;
@@ -31,7 +31,8 @@ struct Time_Interaction : public AbstractInteraction {
     void apply(PistolHitscan_Wrapper* second) override;
     void apply(BlueRailcannonHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
-    ~Time_Interaction();
+    void apply(ParryProjectile_Wrapper* second) override;
+    ~Time_Interaction() override;
 };
 AbstractWrapper* wrap(qreal* timeItem);
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -46,7 +47,7 @@ struct Input_Wrapper : public AbstractWrapper {
     QPointF* mouseDir;
     AbstractInteraction* generateInteraction() override;
     void accept(AbstractInteraction* interaction) override;
-    virtual ~Input_Wrapper() override;
+    ~Input_Wrapper() override;
 };
 struct Input_Interaction : public AbstractInteraction {
     Input_Wrapper* first;
@@ -62,7 +63,8 @@ struct Input_Interaction : public AbstractInteraction {
     void apply(PistolHitscan_Wrapper* second) override;
     void apply(BlueRailcannonHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
-    virtual ~Input_Interaction() override;
+    void apply(ParryProjectile_Wrapper* second) override;
+    ~Input_Interaction() override;
 };
 AbstractWrapper* wrap(int* inputItem, QPointF* mouseItem);
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -92,6 +94,7 @@ struct Spawn_Interaction : public AbstractInteraction {
     void apply(PistolHitscan_Wrapper* second) override;
     void apply(BlueRailcannonHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
+    void apply(ParryProjectile_Wrapper* second) override;
 };
 AbstractWrapper* wrap(Model* item);
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -120,6 +123,40 @@ struct Despawn_Interaction : public AbstractInteraction {
     void apply(PistolHitscan_Wrapper* second) override;
     void apply(BlueRailcannonHitscan_Wrapper* second) override;
     void apply(AndreBallProjectile_Wrapper* second) override;
+    void apply(ParryProjectile_Wrapper* second) override;
+};
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+// Trigger manager
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+struct TriggerManager_Wrapper;
+struct TriggerManager_Interaction;
+
+struct TriggerManager_Wrapper : public AbstractWrapper {
+    bool* activeTriggersPresent;
+    bool* livingEnemiesPresent;
+    AbstractInteraction* generateInteraction() override;
+    void accept(AbstractInteraction* interaction) override;
+    ~TriggerManager_Wrapper() override;
+};
+
+struct TriggerManager_Interaction : public AbstractInteraction {
+    TriggerManager_Wrapper* first;
+    void apply(Wall_Wrapper* second) override;
+    void apply(Door_Wrapper* second) override;
+    void apply(MovableEntity_Wrapper* second) override;
+    void apply(PlayerEntity_Wrapper* second) override;
+    void apply(Projectile_Wrapper* second) override;
+    void apply(EnemyFilth_Wrapper* second) override;
+    void apply(EnemyAndre_Wrapper* second) override;
+    void apply(Trigger_Wrapper* second) override;
+    void apply(Hitscan_Wrapper* second) override;
+    void apply(PistolHitscan_Wrapper* second) override;
+    void apply(BlueRailcannonHitscan_Wrapper* second) override;
+    void apply(AndreBallProjectile_Wrapper* second) override;
+    void apply(ParryProjectile_Wrapper* second) override;
+    ~TriggerManager_Interaction() override;
 };
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

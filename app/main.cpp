@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     QApplication::addLibraryPath("C:/Qt/6.5.0/mingw_64/plugins");
     QApplication::addLibraryPath("D:/Qt/6.5.0/mingw_64/plugins");
     QApplication app(argc, argv);
-    auto* window = new MainWindow(10, {10000, 10000});
+    auto* window = new MainWindow(20, {50000, 50000});
     window->show();
     return app.exec();
 }

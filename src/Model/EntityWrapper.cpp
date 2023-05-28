@@ -1,8 +1,8 @@
 #include <Model/EntityWrapper.h>
 #include <QDebug>
 
-AbstractWrapper::~AbstractWrapper() noexcept {}
-AbstractInteraction::~AbstractInteraction() noexcept {}
+AbstractWrapper::~AbstractWrapper() = default;
+AbstractInteraction::~AbstractInteraction() = default;
 
 // generating interactions
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -80,6 +80,12 @@ AbstractInteraction* AndreBallProjectile_Wrapper::generateInteraction()
     inter->first = this;
     return inter;
 }
+AbstractInteraction *ParryProjectile_Wrapper::generateInteraction()
+{
+    auto* inter = new ParryProjectile_Interaction;
+    inter->first = this;
+    return inter;
+}
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -130,6 +136,10 @@ void BlueRailcannonHitscan_Wrapper::accept(AbstractInteraction *interaction)
     interaction->apply(this);
 }
 void AndreBallProjectile_Wrapper::accept(AbstractInteraction *interaction)
+{
+    interaction->apply(this);
+}
+void ParryProjectile_Wrapper::accept(AbstractInteraction *interaction)
 {
     interaction->apply(this);
 }
@@ -192,11 +202,15 @@ void Wall_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void Wall_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void Wall_Interaction::apply(AndreBallProjectile_Wrapper *second)
 {
-    auto* wall = first->item;
-    auto* proj = second->item;
-    if(wall->getCollider()->intersects(proj->getCollider())) {
-        proj->setState(AndreBallProjectile::STATE::DESTROYED);
-    }
+    auto* wrapper = wrap(static_cast<Projectile*>(second->item));
+    interact(first, wrapper);
+    delete wrapper;
+}
+void Wall_Interaction::apply(ParryProjectile_Wrapper *second)
+{
+    auto* wrapper = wrap(static_cast<Projectile*>(second->item));
+    interact(first, wrapper);
+    delete wrapper;
 }
 
 void Door_Interaction::apply(Wall_Wrapper *second) {}
@@ -256,10 +270,15 @@ void Door_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void Door_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void Door_Interaction::apply(AndreBallProjectile_Wrapper *second)
 {
-    auto* door = first->item;
-    auto* proj = second->item;
-    if(door->isActive() && door->getCollider()->intersects(proj->getCollider()))
-        proj->setState(AndreBallProjectile::STATE::DESTROYED);
+    auto* wrapper = wrap(static_cast<Projectile*>(second->item));
+    interact(first, wrapper);
+    delete wrapper;
+}
+void Door_Interaction::apply(ParryProjectile_Wrapper *second)
+{
+    auto* wrapper = wrap(static_cast<Projectile*>(second->item));
+    interact(first, wrapper);
+    delete wrapper;
 }
 
 void MovableEntity_Interaction::apply(Wall_Wrapper *second) {}
@@ -274,6 +293,7 @@ void MovableEntity_Interaction::apply(Hitscan_Wrapper *second) {}
 void MovableEntity_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void MovableEntity_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void MovableEntity_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void MovableEntity_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
 void PlayerEntity_Interaction::apply(Wall_Wrapper *second) {}
 void PlayerEntity_Interaction::apply(Door_Wrapper *second) {}
@@ -293,6 +313,7 @@ void PlayerEntity_Interaction::apply(Hitscan_Wrapper *second) {}
 void PlayerEntity_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void PlayerEntity_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void PlayerEntity_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void PlayerEntity_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
 void Projectile_Interaction::apply(Wall_Wrapper *second) {}
 void Projectile_Interaction::apply(Door_Wrapper *second) {}
@@ -344,6 +365,7 @@ void Projectile_Interaction::apply(Hitscan_Wrapper *second) {}
 void Projectile_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void Projectile_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void Projectile_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void Projectile_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
 void EnemyFilth_Interaction::apply(Wall_Wrapper *second) {}
 void EnemyFilth_Interaction::apply(Door_Wrapper *second) {}
@@ -377,6 +399,7 @@ void EnemyFilth_Interaction::apply(Hitscan_Wrapper *second) {}
 void EnemyFilth_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void EnemyFilth_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void EnemyFilth_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void EnemyFilth_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
 void EnemyAndre_Interaction::apply(Wall_Wrapper *second) {}
 void EnemyAndre_Interaction::apply(Door_Wrapper *second) {}
@@ -398,17 +421,15 @@ void EnemyAndre_Interaction::apply(Hitscan_Wrapper *second) {}
 void EnemyAndre_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void EnemyAndre_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void EnemyAndre_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void EnemyAndre_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
 void Trigger_Interaction::apply(Wall_Wrapper *second) {}
-void Trigger_Interaction::apply(Door_Wrapper *second)
-{
-    second->item->setActive(first->item->isTriggered());
-}
+void Trigger_Interaction::apply(Door_Wrapper *second) {}
 void Trigger_Interaction::apply(MovableEntity_Wrapper *second) {}
 void Trigger_Interaction::apply(PlayerEntity_Wrapper *second)
 {
     if(first->item->intersects(second->item->getCollider()))
-        first->item->setTriggered(true);
+        first->item->setState(Trigger::STATE::TRIGGERED);
 }
 void Trigger_Interaction::apply(Projectile_Wrapper *second) {}
 void Trigger_Interaction::apply(EnemyFilth_Wrapper *second) {}
@@ -418,6 +439,7 @@ void Trigger_Interaction::apply(Hitscan_Wrapper *second) {}
 void Trigger_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void Trigger_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void Trigger_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void Trigger_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
 void Hitscan_Interaction::apply(Wall_Wrapper *second)
 {
@@ -465,6 +487,7 @@ void Hitscan_Interaction::apply(Hitscan_Wrapper *second)
 void Hitscan_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void Hitscan_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void Hitscan_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void Hitscan_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
 void PistolHitscan_Interaction::apply(Wall_Wrapper *second)
 {
@@ -512,6 +535,7 @@ void PistolHitscan_Interaction::apply(PistolHitscan_Wrapper *second)
 }
 void PistolHitscan_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void PistolHitscan_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void PistolHitscan_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
 void BlueRailcannonHitscan_Interaction::apply(Wall_Wrapper *second)
 {
@@ -559,6 +583,7 @@ void BlueRailcannonHitscan_Interaction::apply(BlueRailcannonHitscan_Wrapper *sec
     }
 }
 void BlueRailcannonHitscan_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void BlueRailcannonHitscan_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
 void AndreBallProjectile_Interaction::apply(Wall_Wrapper *second) {}
 void AndreBallProjectile_Interaction::apply(Door_Wrapper *second) {}
@@ -588,23 +613,48 @@ void AndreBallProjectile_Interaction::apply(Hitscan_Wrapper *second) {}
 void AndreBallProjectile_Interaction::apply(PistolHitscan_Wrapper *second) {}
 void AndreBallProjectile_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
 void AndreBallProjectile_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void AndreBallProjectile_Interaction::apply(ParryProjectile_Wrapper *second) {}
 
+void ParryProjectile_Interaction::apply(Wall_Wrapper *second) {}
+void ParryProjectile_Interaction::apply(Door_Wrapper *second) {}
+void ParryProjectile_Interaction::apply(MovableEntity_Wrapper *second) {}
+void ParryProjectile_Interaction::apply(PlayerEntity_Wrapper *second) {}
+void ParryProjectile_Interaction::apply(Projectile_Wrapper *second) {}
+void ParryProjectile_Interaction::apply(EnemyFilth_Wrapper *second)
+{
+    auto* wrapper = wrap(static_cast<Projectile*>(first->item));
+    interact(wrapper, second);
+    delete wrapper;
+}
+void ParryProjectile_Interaction::apply(EnemyAndre_Wrapper *second)
+{
+    auto* wrapper = wrap(static_cast<Projectile*>(first->item));
+    interact(wrapper, second);
+    delete wrapper;
+}
+void ParryProjectile_Interaction::apply(Trigger_Wrapper *second) {}
+void ParryProjectile_Interaction::apply(Hitscan_Wrapper *second) {}
+void ParryProjectile_Interaction::apply(PistolHitscan_Wrapper *second) {}
+void ParryProjectile_Interaction::apply(BlueRailcannonHitscan_Wrapper *second) {}
+void ParryProjectile_Interaction::apply(AndreBallProjectile_Wrapper *second) {}
+void ParryProjectile_Interaction::apply(ParryProjectile_Wrapper *second) {}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // interaction destructors
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-Wall_Interaction::~Wall_Interaction() noexcept {}
-Door_Interaction::~Door_Interaction() noexcept {}
-MovableEntity_Interaction::~MovableEntity_Interaction() noexcept {}
-PlayerEntity_Interaction::~PlayerEntity_Interaction() noexcept {}
-Projectile_Interaction::~Projectile_Interaction() noexcept {}
-EnemyFilth_Interaction::~EnemyFilth_Interaction() noexcept {}
-EnemyAndre_Interaction::~EnemyAndre_Interaction() noexcept {}
-Trigger_Interaction::~Trigger_Interaction() noexcept {}
-Hitscan_Interaction::~Hitscan_Interaction() noexcept {}
-PistolHitscan_Interaction::~PistolHitscan_Interaction() noexcept {}
-BlueRailcannonHitscan_Interaction::~BlueRailcannonHitscan_Interaction() noexcept {}
-AndreBallProjectile_Interaction::~AndreBallProjectile_Interaction() noexcept {}
+Wall_Interaction::~Wall_Interaction() = default;
+Door_Interaction::~Door_Interaction() = default;
+MovableEntity_Interaction::~MovableEntity_Interaction() = default;
+PlayerEntity_Interaction::~PlayerEntity_Interaction() = default;
+Projectile_Interaction::~Projectile_Interaction() = default;
+EnemyFilth_Interaction::~EnemyFilth_Interaction() = default;
+EnemyAndre_Interaction::~EnemyAndre_Interaction() = default;
+Trigger_Interaction::~Trigger_Interaction() = default;
+Hitscan_Interaction::~Hitscan_Interaction() = default;
+PistolHitscan_Interaction::~PistolHitscan_Interaction() = default;
+BlueRailcannonHitscan_Interaction::~BlueRailcannonHitscan_Interaction() = default;
+AndreBallProjectile_Interaction::~AndreBallProjectile_Interaction() = default;
+ParryProjectile_Interaction::~ParryProjectile_Interaction() = default;
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
@@ -632,4 +682,5 @@ AbstractWrapper* wrap(Hitscan* item) {auto wrapper = new Hitscan_Wrapper; wrappe
 AbstractWrapper* wrap(PistolHitscan* item) {auto wrapper = new PistolHitscan_Wrapper; wrapper->item = item; return wrapper;}
 AbstractWrapper* wrap(BlueRailcannonHitscan* item) {auto wrapper = new BlueRailcannonHitscan_Wrapper; wrapper->item = item; return wrapper;}
 AbstractWrapper* wrap(AndreBallProjectile* item) {auto wrapper = new AndreBallProjectile_Wrapper; wrapper->item = item; return wrapper;}
+AbstractWrapper* wrap(ParryProjectile* item) {auto wrapper = new ParryProjectile_Wrapper; wrapper->item = item; return wrapper;}
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
